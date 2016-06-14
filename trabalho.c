@@ -54,7 +54,7 @@ int main()
 	shmat = mapeamento de uma área de memória compartilhada
 	
 */    
-
+z
     mem_id = shmget(CHAVE, sizeof(int)*256,0777|IPC_CREAT);
     if(mem_id < 0){
     	printf("Erro ao criar area de memoria compartilhada\n");
