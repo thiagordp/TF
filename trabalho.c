@@ -6,6 +6,7 @@
 #include <string.h>
 #include <semaphore.h>
 #include <pthread.h>
+
 #define CHAVE_MEMORIA_COMPARTILHADA 10
 
 
@@ -53,18 +54,20 @@ int main()
 	shmget = criação de uma área de memória compartilhada
 	shmat = mapeamento de uma área de memória compartilhada
 	
-*/    
+*/
 
-    mem_id = shmget(CHAVE, sizeof(int)*256,0777|IPC_CREAT);
-    if(mem_id < 0){
-    	printf("Erro ao criar area de memoria compartilhada\n");
-    	exit(0);
+    mem_id = shmget(CHAVE, sizeof(int) * 256, 0777 | IPC_CREAT);
+    if (mem_id < 0)
+    {
+        printf("Erro ao criar area de memoria compartilhada\n");
+        exit(0);
     }
 
-    ptr_mem = (int*)shmat(mem_id, (char*)0, 0);
-    if(ptr_mem == NULL){
-    	printf("Erro de mapeamento de memoria...\n");
-    	exit(0);
+    ptr_mem = (int *) shmat(mem_id, (char *) 0, 0);
+    if (ptr_mem == NULL)
+    {
+        printf("Erro de mapeamento de memoria...\n");
+        exit(0);
     }
 
 /* 
@@ -97,29 +100,31 @@ int main()
         }
         else
         {
-        	proc_filho = fork();
-        	if(proc_filho == 0){
+            proc_filho = fork();
+            if (proc_filho == 0)
+            {
 
-        		//Falta declarar as variaveis: operation, option, text fonte utilizada para usar o strtok:http://www.hardware.com.br/comunidade/delimitadores-string/1101216/	
-        		read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
-        		char *token = NULL;
+                //Falta declarar as variaveis: operation, option, text fonte utilizada para usar o strtok:http://www.hardware.com.br/comunidade/delimitadores-string/1101216/
+                read(sock_des_cli, msg_buffer, sizeof(msg_buffer));
+                char *token = NULL;
 
-    			token = strtok(msg_buffer, ";");
-    			operation = token;
+                token = strtok(msg_buffer, ";");
+                operation = token;
 
-    			token = strtok(NULL, ";");
-    			option = token;
+                token = strtok(NULL, ";");
+                option = token;
 
-    			token = strtok(NULL, ";");
-    			text = token;
+                token = strtok(NULL, ";");
+                text = token;
 
-            	pthread_t new_connection_tid;
-            	//criar a thread para o usuario passa como argumento o proprio
-            	pthread_create(&new_connection_tid, NULL, Options, NULL);
+                pthread_t new_connection_tid;
+                //criar a thread para o usuario passa como argumento o proprio
+                pthread_create(&new_connection_tid, NULL, Options, NULL);
 
-        	}else if(proc_filho > 0){
+            } else if (proc_filho > 0)
+            {
 
-        	}
+            }
 
 
             //retirar usuario de usuarios
@@ -127,8 +132,9 @@ int main()
         }else{
 
         }
-        }
     }
+}
+
 }
 
 /*strcat(msg_buffer,hora_data());
