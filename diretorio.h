@@ -3,36 +3,68 @@
 //
 
 #ifndef TF_DIRETORIO_H
-#define TF_DIRETORIO_H
+#define TF_DIRETORIO_Hs
 
 #include "arquivo.h"
+#include "listaArquivo.h"
+#include "listaPasta.h"
+#include "util.h"
 
-#define MAX_SUB_DIR 4
-#define MAX_ARQ 4
-
-// Estrutura do arquivo
+/**
+ * Representação de um diretório/pasta no sistema.
+ */
 typedef struct
 {
-    char *nomeDir;
+    /**
+     * Nome do diretório.
+     */
+    char nomeDir[MAX_SIZE_NAME_ARQ];
 
-    long count_arq;
-    long count_dir;
+    /**
+     * Número de arquivos no diretório.
+     */
+    long count_arq = 0;
 
-    arquivo_t **arquivos;
-    diretorio_t **diretorios;
+    /**
+     * Número de subdiretórios.
+     */
+    long count_dir = 0;
+
+    /**
+     * Ponteiro para o primeiro arquivo da pasta.
+     */
+    itemSubDir_t listasubDirs;
+
+    /**
+     *  Ponteiro para o primeiro subdiretório da pasta.
+     */
+    itemArquivo_t listaArqs;
+
+    /**
+     *  Ponteiro para o direito pai do atual.
+     */
+    diretorio_t *UpDir;
+
 } diretorio_t;
 
+/**
+ * Cria diretório
+ */
+void criaDir(char nome[], diretorio_t &dirAtual);
 
-// Cria diretório
-void criaDir();
+/**
+ * Apaga Diretório
+ */
+void apagaDir(diretorio_t &dirAtual);
 
-// Apaga Diretório
-void apagaDir();
+/**
+ * Abre Diretório dentro do atual
+ */
+void openDir(char nome[], diretorio_t &dirAtual);
 
-// Abre Diretório
-void openDir();
-
-// Fecha Diretório
-void closeDir();
+/**
+ * Fecha Diretório
+ */
+void closeDir(char nome[], diretorio_t &dirAtual);
 
 #endif //TF_DIRETORIO_H

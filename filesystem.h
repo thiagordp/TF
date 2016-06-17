@@ -5,4 +5,14 @@
 #ifndef TF_FILESYSTEM_H
 #define TF_FILESYSTEM_H
 
+#include "arquivo.h"
+#include "diretorio.h"
+
+diretorio_t *root = NULL;
+
+/**
+ * Recebe um comando e um
+ * */
+void comando(char comando[], size_data_t tamCmd, char dados[], size_data_t tamDados);
+
 #endif //TF_FILESYSTEM_H
