@@ -33,38 +33,28 @@ typedef struct
     /**
      * Ponteiro para o primeiro arquivo da pasta.
      */
-    itemSubDir_t listasubDirs;
+    itemSubDir_t *listasubDirs;
 
     /**
      *  Ponteiro para o primeiro subdiretório da pasta.
      */
-    itemArquivo_t listaArqs;
-
-    /**
-     *  Ponteiro para o direito pai do atual.
-     */
-    diretorio_t *UpDir;
-
+    itemArquivo_t *listaArqs;
 } diretorio_t;
 
 /**
  * Cria diretório
  */
-void criaDir(char nome[], diretorio_t &dirAtual);
+int criaDir(char nome[], diretorio_t *dirAtual);
 
 /**
  * Apaga Diretório
  */
-void apagaDir(diretorio_t &dirAtual);
+int apagaDir(char nome[], diretorio_t *dirAtual);
 
-/**
- * Abre Diretório dentro do atual
- */
-void openDir(char nome[], diretorio_t &dirAtual);
+/*Listagem dos subdiretórios*/
+int listaSubDir(diretorio_t *dirAtual);
 
-/**
- * Fecha Diretório
- */
-void closeDir(char nome[], diretorio_t &dirAtual);
+/*Renomear o nome do diretório.*/
+int renomeiaDir(diretorio_t *dirAtual);
 
 #endif //TF_DIRETORIO_H

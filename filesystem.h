@@ -15,4 +15,8 @@ diretorio_t *root = NULL;
  * */
 void comando(char comando[], size_data_t tamCmd, char dados[], size_data_t tamDados);
 
+
+// memória compartilhada.
+// semáforo
+
 #endif //TF_FILESYSTEM_H

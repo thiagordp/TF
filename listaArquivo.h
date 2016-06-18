@@ -12,8 +12,14 @@
  */
 typedef struct
 {
-    arquivo_t *prevArquivo = NULL;
-    arquivo_t *nextArquivo = NULL;
+    // lista com cabeça
+    arquivo_t *arquivo = NULL;
+    itemSubDir_t *upDir = NULL;
+    itemArquivo_t *prevArq = NULL;
+    itemArquivo_t *nextArq = NULL;
+
 } itemArquivo_t;
+
+
 
 #endif //TF_LISTAARQUIVO_H

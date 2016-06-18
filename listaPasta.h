@@ -12,9 +12,12 @@
  */
 typedef struct
 {
-    diretorio_t *prevDiretorio = NULL;
-    diretorio_t *nextDiretorio = NULL;
-} itemSubDir_t;
+    diretorio_t *diretorio = NULL;
 
+    itemSubDir_t *prevDir = NULL;
+    itemSubDir_t *nextDir = NULL;
+
+    // não precisa do pai.
+} itemSubDir_t;
 
 #endif //TF_LISTAPASTA_H

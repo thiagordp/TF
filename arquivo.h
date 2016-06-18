@@ -20,7 +20,7 @@ typedef struct
     /**
      * Extensão do arquivo
      */
-    char extensaoArq[MAX_SIZE_EXT_ARQ];
+    // char extensaoArq[MAX_SIZE_EXT_ARQ];
 
     /**
      * Tamanho em bytes dos dados do arquivo
@@ -32,26 +32,22 @@ typedef struct
      */
     byte *dados;
 
-    /**
-     * Diretório que contém o arquivo.
-     */
-    diretorio_t *UpDir;
 } arquivo_t;
 
 /**
  * Cria o arquivo com nome no diretorio atual e retorna o ponteiro para ele.
  */
-arquivo_t *criaArq(char nome[], char ext[], diretorio_t *diretorio);
+arquivo_t *criaArq(char nome[], char dados[], diretorio_t *diretorio);
 
 /**
  * Apaga o arquivo e retorna um inteiro indicando o resultado.
  */
-byte apagaArq(arquivo_t *arquivo, diretorio_t *diretorio);
+byte apagaArq(char nome[], diretorio_t *diretorio);
 
 /**
  * Abre o arquivo retornando o
  */
-arquivo_t *abreArq(char nome[]);
+arquivo_t *abreArq(char nome[], diretorio_t* diretorio);
 
 /**
  * Encontra o arquivo com nome indicado e retorna o ponteiro pra ele.
@@ -59,14 +55,9 @@ arquivo_t *abreArq(char nome[]);
 // arquivo_t *procuraArq(char nome[]);
 
 /**
- * Fecha o arquivo com o nome indicado.
- */
-byte fechaArq(char *nome);
-
-/**
  * Lê os dados do arquivo indicado.
  */
-byte *leArq(arquivo_t *arquivo);
+byte *leArq(char nome[], diretorio_t* diretorio);
 
 /**
  * Escreve o arquivo com o vetor de bytes no arquivo indicado
