@@ -20,14 +20,15 @@ int main(){
    dest.sin_family = AF_INET;
    dest.sin_addr.s_addr = htonl(INADDR_ANY); /* set destination IP number - localhost, 127.0.0.1*/ 
    dest.sin_port = htons(2000);                /* set destination port number */
- 
-   connect(mysocket, (struct sockaddr *)&dest, sizeof(struct sockaddr));
+	if (connect(mysocket, (struct sockaddr*)&dest, sizeof(struct sockaddr)) < 0){
+		printf("Erro\n");
+		exit(0);
+   }
   
-   len = recv(mysocket, buffer, 500, 0);
-
-    buffer[len] = '\0';
- 
-   printf("Received %s (%d bytes).\n", buffer, len);
+   read(mysocket, buffer, sizeof(buffer));
+sleep(3);	
+     
+   printf("Received \n%s",buffer);
  
    close(mysocket);
  	return 0;

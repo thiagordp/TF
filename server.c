@@ -15,9 +15,9 @@
 */
 
 
-void *Options(void *c);
+void *Options();
 
-sem_t s_servidor, s_cliente;
+sem_t s_cliente;
 
 
 
@@ -27,6 +27,7 @@ int main()
     struct sockaddr_in servidor, sock_cli;
     char msg_buffer[80];
     int ultimoUser = 0;
+    sem_init(&s_cliente, 0, 1);
 
 /* 
 
@@ -88,11 +89,11 @@ int main()
         exit(0);
     }else{
         printf("Servidor pronto para conexoes....\n\n");
-        sem_init(&s_servidor, 0, 1);
+        //sem_init(&s_servidor, 0, 1);
     }
 
 
-    for (; ;)
+    while(1)
     {
         fromlen = sizeof(sock_cli); // Tamanho da struct do cliente
 
@@ -103,11 +104,14 @@ int main()
         }
         else
         {
+		printf("conexao aceita\n");
+		
         	proc_filho = fork();
         	if(proc_filho == 0){
-
+			printf("processo filho id:%d\n",getpid());
         		//Falta declarar as variaveis: operation, option, text 
-        		read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
+        		//read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
+			//printf("depois de ler\n");
 			/*
         		char *token = NULL;
 
@@ -120,11 +124,22 @@ int main()
     			token = strtok(NULL, ";");
     			text = token;
 			*/
-		write(sock_des_cli, "Ola vc conectou!", strlen("Ola vc conectou!")+1);
-
-            	pthread_t new_connection_tid;
-            	//criar a thread para o usuario passa como argumento o proprio
-            	pthread_create(&new_connection_tid, NULL, Options, NULL);
+			
+			//printf("tenta imprimir\n");
+			//printf("%s\n",msg_buffer);
+			
+			sem_wait(&s_cliente); //protocolo de acesso			
+			
+			printf("servidor escrevendo no socket\n");			
+			write(sock_des_cli, "Ola!", strlen("Ola!")+1);
+			printf("Finalizada a escrita no socket\n");
+				            	
+			pthread_t new_connection_tid;
+	            	//criar a thread para o usuario passa como argumento o proprio
+	            	pthread_create(&new_connection_tid, NULL, Options, NULL);
+			pthread_join(new_connection_tid,NULL);
+			pthread_exit(NULL);
+			sem_post(&s_cliente); //protocolo de saida
 
         	}else if(proc_filho > 0){
 
@@ -143,9 +158,10 @@ int main()
   write(sock_des_cli,msg_buffer,strlen(msg_buffer));
 */
 
-void *Options(void *c)
+void *Options()
 {
-	printf("Cliente conectou!");
-	    //close(sock_des_cli);
+	printf("Cliente conectou!\n");
+
+	//close(sock_des_cli);
 
 }
