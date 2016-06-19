@@ -5,15 +5,20 @@
 #ifndef TF_DIRETORIO_H
 #define TF_DIRETORIO_Hs
 
+#include "def.h"
 #include "arquivo.h"
+
+/*
 #include "listaArquivo.h"
-#include "listaPasta.h"
+#include "listaPasta.h"*/
+
 #include "util.h"
+
 
 /**
  * Representação de um diretório/pasta no sistema.
  */
-typedef struct
+typedef struct diretorio
 {
     /**
      * Nome do diretório.
@@ -23,38 +28,38 @@ typedef struct
     /**
      * Número de arquivos no diretório.
      */
-    long count_arq = 0;
+    long count_arq;
 
     /**
      * Número de subdiretórios.
      */
-    long count_dir = 0;
+    long count_dir;
 
     /**
      * Ponteiro para o primeiro arquivo da pasta.
      */
-    itemSubDir_t *listasubDirs;
+    struct itemSubDir *listasubDirs;
 
     /**
      *  Ponteiro para o primeiro subdiretório da pasta.
      */
-    itemArquivo_t *listaArqs;
+    struct itemArquivo *listaArqs;
 } diretorio_t;
 
 /**
  * Cria diretório
  */
-int criaDir(char nome[], diretorio_t *dirAtual);
+int criaDir(char nome[], struct diretorio *dirAtual);
 
 /**
  * Apaga Diretório
  */
-int apagaDir(char nome[], diretorio_t *dirAtual);
+int apagaDir(char nome[], struct diretorio *dirAtual);
 
 /*Listagem dos subdiretórios*/
-int listaSubDir(diretorio_t *dirAtual);
+int listaSubDir(struct diretorio *dirAtual);
 
 /*Renomear o nome do diretório.*/
-int renomeiaDir(diretorio_t *dirAtual);
+int renomeiaDir(struct diretorio *dirAtual);
 
 #endif //TF_DIRETORIO_H

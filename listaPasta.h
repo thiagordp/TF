@@ -5,17 +5,18 @@
 #ifndef TF_LISTAPASTA_H
 #define TF_LISTAPASTA_H
 
+#include "def.h"
 #include "diretorio.h"
 
 /**
  * Estrutura que contém ponteiros de diretórios.
  */
-typedef struct
+typedef struct itemSubDir
 {
-    diretorio_t *diretorio = NULL;
+    struct diretorio *diretorio;
 
-    itemSubDir_t *prevDir = NULL;
-    itemSubDir_t *nextDir = NULL;
+    struct itemSubDir *prevDir;
+    struct itemSubDir *nextDir;
 
     // não precisa do pai.
 } itemSubDir_t;

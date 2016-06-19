@@ -5,27 +5,27 @@
 #include "arquivo.h"
 
 
-arquivo_t *criaArq(char nome[], char dados[], diretorio_t *diretorio)
+struct arquivo *criaArq(char nome[], char dados[], struct diretorio *dirAtual)
 {
 
 }
 
-byte apagaArq(char nome[], diretorio_t *diretorio)
+byte apagaArq(char nome[], struct diretorio *dirAtual)
 {
 
 }
 
-arquivo_t *abreArq(char nome[], diretorio_t* diretorio)
+struct arquivo *abreArq(char nome[], struct diretorio *dirAtual)
 {
 
 }
 
-byte *leArq(char nome[], diretorio_t* diretorio)
+byte *leArq(char nome[], struct diretorio *dirAtual)
 {
 
 }
 
-byte escreveArq(arquivo_t *arquivo, byte *dados)
+byte escreveArq(struct arquivo *arquivo, byte *dados)
 {
 
 }
