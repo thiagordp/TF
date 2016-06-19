@@ -10,4 +10,9 @@ struct arquivo;
 struct itemArquivo;
 struct itemSubDir;
 
+typedef struct diretorio diretorio_t;
+typedef struct arquivo arquivo_t;
+typedef struct itemArquivo itemArquivo_t;
+typedef struct itemSubDir itemSubDir_t;
+
 #endif //TF_DEF_H

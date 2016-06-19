@@ -37,17 +37,17 @@ typedef struct arquivo
 /**
  * Cria o arquivo com nome no diretorio atual e retorna o ponteiro para ele.
  */
-struct arquivo *criaArq(char nome[], char dados[], struct diretorio *dirAtual);
+diretorio_t *criaArq(char nome[], char dados[], diretorio_t *dirAtual);
 
 /**
  * Apaga o arquivo e retorna um inteiro indicando o resultado.
  */
-byte apagaArq(char nome[], struct diretorio *dirAtual);
+byte apagaArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Abre o arquivo retornando o
  */
-struct arquivo *abreArq(char nome[], struct diretorio *dirAtual);
+arquivo_t *abreArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Encontra o arquivo com nome indicado e retorna o ponteiro pra ele.
@@ -57,11 +57,11 @@ struct arquivo *abreArq(char nome[], struct diretorio *dirAtual);
 /**
  * Lê os dados do arquivo indicado.
  */
-byte *leArq(char nome[], struct diretorio *dirAtual);
+byte *leArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Escreve o arquivo com o vetor de bytes no arquivo indicado
  */
-byte escreveArq(struct arquivo *arquivo, byte *dados);
+byte escreveArq(arquivo_t *arquivo, byte *dados);
 
 #endif //TF_ARQUIVO_H

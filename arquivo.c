@@ -1,31 +1,32 @@
 //
 // Created by thiagordp on 13/06/16.
 //
-
+#include<stdio.h>
 #include "arquivo.h"
+#include "diretorio.h"
 
+diretorio_t *criaArq(char nome[], char dados[], diretorio_t *dirAtual)
+{
+    diretorio_t dir;
 
-struct arquivo *criaArq(char nome[], char dados[], struct diretorio *dirAtual)
+}
+
+byte apagaArq(char nome[], diretorio_t *dirAtual)
 {
 
 }
 
-byte apagaArq(char nome[], struct diretorio *dirAtual)
+arquivo_t *abreArq(char nome[], diretorio_t *dirAtual)
 {
 
 }
 
-struct arquivo *abreArq(char nome[], struct diretorio *dirAtual)
+byte *leArq(char nome[], diretorio_t *dirAtual)
 {
 
 }
 
-byte *leArq(char nome[], struct diretorio *dirAtual)
-{
-
-}
-
-byte escreveArq(struct arquivo *arquivo, byte *dados)
+byte escreveArq(arquivo_t *arquivo, byte *dados)
 {
 
 }

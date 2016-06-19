@@ -38,28 +38,28 @@ typedef struct diretorio
     /**
      * Ponteiro para o primeiro arquivo da pasta.
      */
-    struct itemSubDir *listasubDirs;
+    itemSubDir_t *listasubDirs;
 
     /**
      *  Ponteiro para o primeiro subdiretório da pasta.
      */
-    struct itemArquivo *listaArqs;
+    itemArquivo_t *listaArqs;
 } diretorio_t;
 
 /**
  * Cria diretório
  */
-int criaDir(char nome[], struct diretorio *dirAtual);
+int criaDir(char nome[], diretorio_t *dirAtual);
 
 /**
  * Apaga Diretório
  */
-int apagaDir(char nome[], struct diretorio *dirAtual);
+int apagaDir(char nome[], diretorio_t *dirAtual);
 
 /*Listagem dos subdiretórios*/
-int listaSubDir(struct diretorio *dirAtual);
+int listaSubDir(diretorio_t *dirAtual);
 
 /*Renomear o nome do diretório.*/
-int renomeiaDir(struct diretorio *dirAtual);
+int renomeiaDir(diretorio_t *dirAtual);
 
 #endif //TF_DIRETORIO_H

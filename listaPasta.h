@@ -13,10 +13,10 @@
  */
 typedef struct itemSubDir
 {
-    struct diretorio *diretorio;
+    diretorio_t *diretorio;
 
-    struct itemSubDir *prevDir;
-    struct itemSubDir *nextDir;
+    itemSubDir_t *prevDir;
+    itemSubDir_t *nextDir;
 
     // não precisa do pai.
 } itemSubDir_t;
