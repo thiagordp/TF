@@ -24,9 +24,8 @@ int main(){
 		printf("Erro\n");
 		exit(0);
    }
-  
+sleep(10);	  
    read(mysocket, buffer, sizeof(buffer));
-sleep(3);	
      
    printf("Received \n%s",buffer);
  
