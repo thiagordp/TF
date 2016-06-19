@@ -14,10 +14,9 @@
 typedef struct itemArquivo
 {
     // lista com cabeça
-    struct arquivo *arquivo;
-    struct itemSubDir *upDir;
-    struct itemArquivo *prevArq;
-    struct itemArquivo *nextArq;
+    arquivo_t *arquivo;
+    itemArquivo_t *prevArq;
+    itemArquivo_t *nextArq;
 
 } itemArquivo_t;
 

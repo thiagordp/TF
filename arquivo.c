@@ -5,7 +5,7 @@
 #include "arquivo.h"
 #include "diretorio.h"
 
-diretorio_t *criaArq(char nome[], char dados[], diretorio_t *dirAtual)
+arquivo_t *criaArq(char nome[], char dados[], diretorio_t *dirAtual)
 {
     diretorio_t dir;
 

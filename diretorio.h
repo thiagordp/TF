@@ -3,7 +3,7 @@
 //
 
 #ifndef TF_DIRETORIO_H
-#define TF_DIRETORIO_Hs
+#define TF_DIRETORIO_H
 
 #include "def.h"
 #include "arquivo.h"
