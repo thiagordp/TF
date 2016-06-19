@@ -5,15 +5,20 @@
 #ifndef TF_DIRETORIO_H
 #define TF_DIRETORIO_Hs
 
+#include "def.h"
 #include "arquivo.h"
+
+/*
 #include "listaArquivo.h"
-#include "listaPasta.h"
+#include "listaPasta.h"*/
+
 #include "util.h"
+
 
 /**
  * Representação de um diretório/pasta no sistema.
  */
-typedef struct
+typedef struct diretorio
 {
     /**
      * Nome do diretório.
@@ -23,12 +28,12 @@ typedef struct
     /**
      * Número de arquivos no diretório.
      */
-    long count_arq = 0;
+    long count_arq;
 
     /**
      * Número de subdiretórios.
      */
-    long count_dir = 0;
+    long count_dir;
 
     /**
      * Ponteiro para o primeiro arquivo da pasta.

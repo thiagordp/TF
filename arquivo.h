@@ -5,12 +5,12 @@
 #define TF_ARQUIVO_H
 
 #include "util.h"
-#include "diretorio.h"
+#include "def.h"
 
 /**
  * Estrutura que representa um arquivo do sistema.
  */
-typedef struct
+typedef struct arquivo
 {
     /**
      * Nome do arquivo
@@ -37,17 +37,17 @@ typedef struct
 /**
  * Cria o arquivo com nome no diretorio atual e retorna o ponteiro para ele.
  */
-arquivo_t *criaArq(char nome[], char dados[], diretorio_t *diretorio);
+diretorio_t *criaArq(char nome[], char dados[], diretorio_t *dirAtual);
 
 /**
  * Apaga o arquivo e retorna um inteiro indicando o resultado.
  */
-byte apagaArq(char nome[], diretorio_t *diretorio);
+byte apagaArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Abre o arquivo retornando o
  */
-arquivo_t *abreArq(char nome[], diretorio_t* diretorio);
+arquivo_t *abreArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Encontra o arquivo com nome indicado e retorna o ponteiro pra ele.
@@ -57,7 +57,7 @@ arquivo_t *abreArq(char nome[], diretorio_t* diretorio);
 /**
  * Lê os dados do arquivo indicado.
  */
-byte *leArq(char nome[], diretorio_t* diretorio);
+byte *leArq(char nome[], diretorio_t *dirAtual);
 
 /**
  * Escreve o arquivo com o vetor de bytes no arquivo indicado

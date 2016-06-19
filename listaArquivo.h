@@ -5,21 +5,21 @@
 #ifndef TF_LISTAARQUIVO_H
 #define TF_LISTAARQUIVO_H
 
+#include "def.h"
 #include "arquivo.h"
 
 /**
  * Estrutura de ponteiros de arquivos para subpastas
  */
-typedef struct
+typedef struct itemArquivo
 {
     // lista com cabeça
-    arquivo_t *arquivo = NULL;
-    itemSubDir_t *upDir = NULL;
-    itemArquivo_t *prevArq = NULL;
-    itemArquivo_t *nextArq = NULL;
+    struct arquivo *arquivo;
+    struct itemSubDir *upDir;
+    struct itemArquivo *prevArq;
+    struct itemArquivo *nextArq;
 
 } itemArquivo_t;
-
 
 
 #endif //TF_LISTAARQUIVO_H
