@@ -9,7 +9,8 @@
 #include "listaArquivo.h"
 #include "listaPasta.h"
 
-int criaDir(char nome[], diretorio_t *dirAtual)
+
+int criaDir(char nome[], diretorio_t **dirAtual)
 {
     // Decl. do ponteiro pro novo diretório
     diretorio_t *novoDiretorio;
@@ -25,37 +26,45 @@ int criaDir(char nome[], diretorio_t *dirAtual)
 
     newListaArq->arquivo = NULL;
 
-    // ao invés disso chamar o criar arquivo
+    // Ao invés disso chamar o criar arquivo
     newListaArq->arquivo = NULL;
     newListaArq->nextArq = newListaArq->prevArq = NULL;
     novoDiretorio->listaArqs = newListaArq;
 
+    // Criação da lista de subdiretórios
     novoDiretorio->listasubDirs = (itemSubDir_t *) malloc(sizeof(itemSubDir_t));
     novoDiretorio->listasubDirs->diretorio = NULL;
     novoDiretorio->listasubDirs->nextDir = novoDiretorio->listasubDirs->prevDir = NULL;
 
-    ///////////////////////////////////////////////////////////////////////////
-    itemSubDir_t *newListaDir = (itemSubDir_t *) malloc(sizeof(itemSubDir_t));
-    newListaDir->nextDir = newListaDir->prevDir = NULL;
-    newListaDir->diretorio = NULL;
+    //
+    printf("-----Diretorio-----\n");
+    printf("end:\t%p\n", novoDiretorio);
+    printf("nome:\t%s\n", novoDiretorio->nomeDir);
+    printf("arq:\t%p\n", novoDiretorio->listaArqs);
+    printf("dir:\t%p\n", novoDiretorio->listasubDirs);
 
-    // Inserção do novo diretório como subDiretório do dirAtual.
-    if (dirAtual == NULL)
+    // --------- Inserção do novo diretório como subDiretório do dirAtual. ---------//
+
+    // Caso o diretório não exista ainda.
+    if (*dirAtual == NULL)
+    {
+        *dirAtual = novoDiretorio; // O diretório criado é o root.
+    }
+
+        // Caso a lista de subdiretório esteja vazia.
+    else if ((*dirAtual)->listasubDirs == NULL)
     {
 
     }
-    else if (dirAtual->listasubDirs == NULL)
-    {
-        dirAtual->listasubDirs = newListaDir;
-    }
+
+        // Caso tudo já tenha sido criado pelo menos uma vez.
     else
     {
-        newListaDir->nextDir = dirAtual->listasubDirs->nextDir;
-
-        newListaDir->prevDir = dirAtual->listasubDirs;
-
-        dirAtual->listasubDirs->prevDir = NULL;
-        printf("Start\n");
+        itemSubDir_t *novoDir = (itemSubDir_t *) malloc(sizeof(itemSubDir_t));
+        novoDir->diretorio = novoDiretorio;
+        novoDir->prevDir = (*dirAtual)->listasubDirs;
+        novoDir->nextDir = (*dirAtual)->listasubDirs->nextDir;
+        (*dirAtual)->listasubDirs->nextDir = novoDir;
     }
 }
 

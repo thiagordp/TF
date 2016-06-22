@@ -30,14 +30,15 @@ typedef struct arquivo
     /**
      * Dados do arquivo
      */
-    byte *dados;
+    char dados[MAX_SIZE_ARQ];
 
 } arquivo_t;
 
 /**
- * Cria o arquivo com nome no diretorio atual e retorna o ponteiro para ele.
+ * Cria o arquivo com nome no diretorio atual que deve existir obrigatoriamente e
+ * retorna o ponteiro para ele.
  */
-arquivo_t *criaArq(char nome[], char dados[], diretorio_t *diretorio);
+arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *diretorio);
 
 /**
  * Apaga o arquivo e retorna um inteiro indicando o resultado.
@@ -62,6 +63,6 @@ byte *leArq(char nome[], diretorio_t *diretorio);
 /**
  * Escreve o arquivo com o vetor de bytes no arquivo indicado
  */
-byte escreveArq(arquivo_t *arquivo, byte *dados);
+byte escreveArq(arquivo_t *arquivo, byte dados[]);
 
 #endif //TF_ARQUIVO_H

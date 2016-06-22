@@ -49,7 +49,7 @@ typedef struct diretorio
 /**
  * Cria diretório
  */
-int criaDir(char nome[], diretorio_t *dirAtual);
+int criaDir(char nome[], diretorio_t **dirAtual);
 
 /**
  * Apaga Diretório
