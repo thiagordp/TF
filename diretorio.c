@@ -56,7 +56,6 @@ int criaDir(char nome[], diretorio_t **dirAtual)
     {
 
     }
-
         // Caso tudo já tenha sido criado pelo menos uma vez.
     else
     {
@@ -70,15 +69,46 @@ int criaDir(char nome[], diretorio_t **dirAtual)
 
 int apagaDir(char nome[], diretorio_t *dirAtual)
 {
-
+    
 }
 
 int listaSubDir(diretorio_t *dirAtual)
 {
+    printf("---------------------------------\n> %s\n---------------------------------\n",
+           dirAtual->nomeDir);
+    printf("Nome\t\t\tNo Arqs\t\tNo Dirs\t\t\n");
+
+    itemSubDir_t *item;
+    diretorio_t *dir;
+    for (item = dirAtual->listasubDirs->nextDir; item != NULL; item = item->nextDir)
+    {
+        dir = item->diretorio;
+
+        printf("%s\t\t\t%ld\t\t%ld\n", dir->nomeDir, dir->count_arq, dir->count_dir);
+    }
+}
+
+int listaArquivo(diretorio_t *dirAtual)
+{
 
 }
 
-int renomeiaDir(diretorio_t *dirAtual)
+int renomeiaDir(char nome[], diretorio_t *dirAtual)
 {
+    if (dirAtual == NULL)
+    {
+        return -2;
+    }
+    else if (strlen(nome) == 0)
+    {
+        return -1;
+    }
+    else if (strlen(nome) > MAX_SIZE_NAME_ARQ)
+    { // Corrigir o tamnho
+        return 0;
+    }
 
+    strcpy(dirAtual->nomeDir, nome);
+
+    return 1;
 }

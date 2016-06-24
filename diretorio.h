@@ -56,10 +56,19 @@ int criaDir(char nome[], diretorio_t **dirAtual);
  */
 int apagaDir(char nome[], diretorio_t *dirAtual);
 
-/*Listagem dos subdiretórios*/
+/**
+ * Listagem dos subdiretórios
+ */
 int listaSubDir(diretorio_t *dirAtual);
 
-/*Renomear o nome do diretório.*/
-int renomeiaDir(diretorio_t *dirAtual);
+/**
+ * Lista os arquivos do diretório indicado.
+ */
+int listaArquivo(diretorio_t *dirAtual);
+
+/*
+ * Renomear o nome do diretório.
+ */
+int renomeiaDir(char nome[], diretorio_t *dirAtual);
 
 #endif //TF_DIRETORIO_H
