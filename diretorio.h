@@ -52,7 +52,7 @@ typedef struct diretorio
 int criaDir(char nome[], diretorio_t **dirAtual);
 
 /**
- * Apaga Diretório
+ * Apaga o diretório com o nome indicado que está dentro da pasta indicada.
  */
 int apagaDir(char nome[], diretorio_t *dirAtual);
 
@@ -70,5 +70,22 @@ int listaArquivo(diretorio_t *dirAtual);
  * Renomear o nome do diretório.
  */
 int renomeiaDir(char nome[], diretorio_t *dirAtual);
+
+/**
+ *
+ */
+diretorio_t *procuraArquivo(char nome[], diretorio_t *dirAtual);
+
+
+/**
+ * Move o diretório que outro
+ *
+ * @param dir         - Diretório que será movido
+ * @param dirOrigem   - Diretório de origem
+ * @param dirDestino  - Diretório de destino
+ *
+ * @return Status da operação
+ * */
+int moveDir(diretorio_t *dir, diretorio_t *dirOrigem, diretorio_t *dirDestino);
 
 #endif //TF_DIRETORIO_H

@@ -51,7 +51,7 @@ short apagaArq(char nome[], diretorio_t *dirAtual)
 
     if (arq == NULL || itemArq == NULL)
     {
-        return -2;
+        return ER_NULL_POINTER;
     }
 
     // Mexer os ponteiros

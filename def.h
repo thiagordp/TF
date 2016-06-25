@@ -15,4 +15,6 @@ typedef struct arquivo arquivo_t;
 typedef struct itemArquivo itemArquivo_t;
 typedef struct itemSubDir itemSubDir_t;
 
+#define ER_NULL_POINTER -2
+
 #endif //TF_DEF_H
