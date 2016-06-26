@@ -84,8 +84,25 @@ short renomeiaArq(char nome[], arquivo_t *arquivo);
 
 /**
  * Calcula o tamanho do arquivo somando o números de bytes do nome e dos dados.
- * */
+ */
 size_data_t sizeArq(arquivo_t *arq);
 
+/**
+ * Move o diretório que outro
+ *
+ * @param nome        Nome do arquivo que será movido.
+ * @param dirOrigem   Diretório de origem
+ * @param dirDestino  Diretório de destino
+ *
+ * @return Status da operação
+ * */
+int moveArquivo(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
+
+/**
+ * Varre o sistema de diretório em busca de um arquivo com
+ * o nome indicado a partir do diretório atual.
+ */
+
+int varreArquivo(char nome[], diretorio_t *root, arquivo_t **arq)
 
 #endif //TF_ARQUIVO_H

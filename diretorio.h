@@ -74,18 +74,28 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual);
 /**
  *
  */
-diretorio_t *procuraArquivo(char nome[], diretorio_t *dirAtual);
-
+diretorio_t *procuraDiretorio(char nome[], diretorio_t *dirAtual);
 
 /**
  * Move o diretório que outro
  *
- * @param dir         - Diretório que será movido
- * @param dirOrigem   - Diretório de origem
- * @param dirDestino  - Diretório de destino
+ * @param nome        Nome do arquivo que será movido.
+ * @param dirOrigem   Diretório de origem
+ * @param dirDestino  Diretório de destino
  *
  * @return Status da operação
  * */
-int moveDir(diretorio_t *dir, diretorio_t *dirOrigem, diretorio_t *dirDestino);
+int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
+
+/**
+ * Varre o sistema de arquivos em busca de um arquivo com o nome indicado,
+ * a partir do diretório raiz também indicado.
+ *
+ * @param nome | Nome do arquivo
+ * @param root | Diretório raiz por onde a busca começará
+ *
+ * @return Status da operação
+ */
+// arquivo_t *varreArquivo(char nome[], diretorio_t *root);
 
 #endif //TF_DIRETORIO_H

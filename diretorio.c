@@ -200,11 +200,11 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual)
 {
     if (dirAtual == NULL)
     {
-        return -2;
+        return ER_NULL_POINTER;
     }
     else if (strlen(nome) == 0)
     {
-        return -1;
+        return ER_EMPTY_STRING;
     }
     else if (strlen(nome) > MAX_SIZE_NAME_ARQ)
     { // Corrigir o tamnho
@@ -216,7 +216,7 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual)
     return 1;
 }
 
-diretorio_t *procuraArquivo(char nome[], diretorio_t *dirAtual)
+diretorio_t *procuraDiretorio(char *nome, diretorio_t *dirAtual)
 {
     itemSubDir_t *item;
     printf("\nSTART SEARCHING\n");
@@ -238,4 +238,55 @@ diretorio_t *procuraArquivo(char nome[], diretorio_t *dirAtual)
     printf("\nFINISH SEARCH\n");
 
     return NULL;
+}
+
+int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
+{
+    // Verificação de erros
+    if (dirOrigem == NULL || dirDestino == NULL)
+    {
+        return ER_NULL_POINTER;
+    }
+    else if (strlen(nome) == 0)
+    {
+        return ER_EMPTY_STRING;
+    }
+
+    // Prosseguimento sem erros de parâmetros
+
+    itemSubDir_t *item;
+
+    for (item = dirOrigem->listasubDirs->nextDir; item != NULL; item = item->nextDir)
+    {
+        if (strcmp(nome, item->diretorio->nomeDir) == 0)
+        {
+            break;
+        }
+    }
+
+    // Caso não exista na lista retorna NULL
+    if (item == NULL)
+    {
+        return ER_NOT_FOUND;
+    }
+
+    // Arranjo dos ponteiros do diretório original.
+    item->prevDir->nextDir = item->nextDir;
+    if (item->nextDir != NULL)
+    {
+        item->nextDir->prevDir = item->prevDir;
+    }
+
+    // Arranjo dos ponteiros do diretório a ser movido.
+    item->prevDir = dirDestino->listasubDirs;
+    item->nextDir = dirDestino->listasubDirs->nextDir;
+
+    // Arranjo dos ponteiros do diretório de destino.
+    dirDestino->listasubDirs->nextDir = item;
+    if (item->nextDir != NULL)
+    {
+        item->nextDir->prevDir = item;
+    }
+
+    return 1;
 }

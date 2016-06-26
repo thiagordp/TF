@@ -148,3 +148,84 @@ size_data_t sizeArq(arquivo_t *arq)
 {
     return (strlen(arq->dados) + strlen(arq->nomeArq));
 }
+
+arquivo_t *varreArquivo(char nome[], diretorio_t *root)
+{
+    /*
+    // Rever lógica, pq pode ter mais de um arquivo com o mesmo nome,
+    // mais em dir diferentes.
+    if (root == NULL || arq == NULL)
+    {
+        return NULL;
+    }
+    else if (strlen(nome) == 0)
+    {
+        return NULL;
+    }
+
+    itemSubDir_t *itemDir, *tempDir;
+    itemArquivo_t *itemArq, *tempArq;
+
+    for (itemArq = root->listaArqs->nextArq; itemArq != NULL; itemArq = item->nextArq)
+    {
+        if (strcmp(itemArq->arquivo->nomeArq, nome) == 0)
+        {
+            return itemArq->arquivo;
+        }
+    }
+
+    for (itemDir = root->listasubDirs->nextDir; item != NULL; itemDir = itemDir->nextDir)
+    {
+        for (itemArq = root->listaArqs->nextArq; itemArq != NULL; itemArq = item->nextArq)
+        {
+            if (strcmp(itemArq->arquivo->nomeArq, nome) == 0)
+            {
+
+            }
+        }
+    }*/
+}
+
+int moveArquivo(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
+{    // Verificação de erros
+    if (dirOrigem == NULL || dirDestino == NULL)
+    {
+        return ER_NULL_POINTER;
+    }
+    else if (strlen(nome) == 0)
+    {
+        return ER_EMPTY_STRING;
+    }
+
+    itemArquivo_t *item;
+
+    for (item = dirOrigem->listaArqs->nextArq; item != NULL; item = item->nextArq)
+    {
+        if (strcmp(nome, item->arquivo->nomeArq) == 0)
+        {
+            break;
+        }
+    }
+
+    if (item == NULL)
+    {
+        return ER_NOT_FOUND;
+    }
+
+    item->prevArq->nextArq = item->nextArq;
+    if (item->nextArq != NULL)
+    {
+        item->nextArq->prevArq = item->prevArq;
+    }
+
+    item->prevArq = dirDestino->listaArqs;
+    item->nextArq = dirDestino->listaArqs->nextArq;
+
+    dirDestino->listaArqs->nextArq = item;
+    if (item->nextArq != NULL)
+    {
+        item->nextArq->prevArq = item;
+    }
+
+    return NO_ERROR;
+}
