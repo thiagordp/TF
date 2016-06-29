@@ -5,11 +5,11 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <semaphore.h>
+#include <errno.h>
 #include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #define CHAVE_MEMORIA_COMPARTILHADA 10
-
 /*
     include das structs no programa cliente, para o mesmo poder ler na memória compartilhada a estrutura de arquivos
 */
@@ -17,21 +17,21 @@
 
 void *Options();
 
+/*
+	semaforo
+*/
 sem_t s_cliente;
+sem_t* ptr_semaforo;
 
-
+int sock_des_cli;
 
 int main()
 {
 
 /*
-	semaforo
-*/
-    sem_t* ptr_semaforo;
-/*
 	variaveis do socket
 */
-    int socket_des, fromlen, sock_des_cli, tamanho_cliente, proc_filho, mem_id, ptr_mem; //
+    int socket_des, fromlen, tamanho_cliente, proc_filho, mem_id, ptr_mem; //
     struct sockaddr_in servidor, sock_cli;
 /*
 	variavel mensagem que sera utilizado para escrita no socket
@@ -41,7 +41,7 @@ int main()
 /*
 	inicializa em 1 o semaforo, verifica se inicializou com sucesso
 */
-    if(sem_init(&s_cliente, 0, 1) == -1){
+    if(sem_init(&s_cliente, 1, 1) == -1){
 	printf("erro ao inicializar o semaforo \n");
   }	
 
@@ -73,6 +73,7 @@ int main()
 */
     if (bind(socket_des, (struct sockaddr *) &servidor, sizeof(servidor)) < 0)
     {
+	printf("PROBLEMA: %s\n",strerror(errno));
         fprintf(stderr, "Erro de bind\n");
         close(socket_des);  // Fecha
         exit(0);
@@ -127,11 +128,13 @@ int main()
         }
         else
         {
+		printf("------------------------------------------\n");
 		printf("conexao aceita\n");
 		
         	proc_filho = fork();
         	if(proc_filho == 0){
 			printf("processo filho id:%d\n",getpid());
+			printf("------------------------------------------\n");
         		//Falta declarar as variaveis: operation, option, text 
         		//read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
 			//printf("depois de ler\n");
@@ -160,9 +163,9 @@ int main()
 			int key = 10;
 			write(sock_des_cli, key, sizeof(key));
 			printf("Finalizada a escrita no socket\n");
-
-			read(sock_des_cli, msg_buffer, sizeof(msg_buffer)+1);
-			printf("Mensagem recebida: %s\n",msg_buffer);
+			printf("------------------------------------------\n");
+			/*read(sock_des_cli, msg_buffer, sizeof(msg_buffer)+1);
+			printf("Mensagem recebida: %s\n",msg_buffer);*/
 
 				            	
 			pthread_t new_connection_tid;
@@ -183,17 +186,29 @@ int main()
     }
 }
 
-/*strcat(msg_buffer,hora_data());
- strcat(msg_buffer,"</html>\n");
-  write(sock_des_cli,msg_buffer,strlen(msg_buffer));
-*/
 
 void *Options()
 {
-//memoria compartilhada
+  sem_t* ptr_mem;
+    int mem_id;
+    printf("Cliente conectou!\n");
+	printf("Endereco semaforo: %p\n",ptr_semaforo);
+	printf("------------------------------------------\n");
+	printf("Antes do sem_wait\n");
+	sem_wait(ptr_semaforo);
+	printf("Depois do sem_wait \n");
+	printf("------------------------------------------\n");
+	/*
+		Acesso a sessao critica
+	*/
+	sleep(10);
+	printf("SESSAO CRITICA \n");
 
-//semaforo
-	printf("Cliente conectou!\n");
-
+	printf("------------------------------------------\n");
+	printf("Antes do sem_post \n");		
+	sem_post(ptr_semaforo);	
+	printf("Depois do sem_post \n");
+	printf("------------------------------------------\n");
+	while(1);
 
 }
