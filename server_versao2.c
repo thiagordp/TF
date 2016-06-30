@@ -9,6 +9,8 @@
 #include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #define CHAVE_MEMORIA_COMPARTILHADA 10
 /*
     include das structs no programa cliente, para o mesmo poder ler na memória compartilhada a estrutura de arquivos
@@ -133,9 +135,33 @@ int main()
 		
         	proc_filho = fork();
         	if(proc_filho == 0){
+			char usuario[30];
+			
+			int fd_server, fd_client;
 			printf("processo filho id:%d\n",getpid());
 			printf("------------------------------------------\n");
-        		//Falta declarar as variaveis: operation, option, text 
+			unlink("pipe.servidor");
+			unlink("pipe.autenticador");
+        		if (mkfifo("pipe.servidor", 0777) < 0) {
+				printf("Erro ao criar pipe do servidor...\n");
+				exit(0);
+			}
+        		if (mkfifo("pipe.autenticador", 0777) < 0) {
+				printf("Erro ao criar pipe do cliente...\n");
+				exit(0);
+			}
+
+			fd_server = open("pipe.servidor", O_RDONLY);
+			fd_client = open("pipe.autenticador", O_WRONLY);
+			if(fd_server < 0){
+				printf("Erro ao abrir PIPE servidor\n");
+			}
+			if(fd_client < 0){
+				printf("Erro ao abrir PIPE cliente\n");
+			}
+
+			
+			//Falta declarar as variaveis: operation, option, text 
         		//read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
 			//printf("depois de ler\n");
 			/*
@@ -160,13 +186,16 @@ int main()
 			/*
 				Servidor escreve no socket
 			*/
-			int key = 10;
+/*			int key = 10;
 			write(sock_des_cli, key, sizeof(key));
+*/
 			printf("Finalizada a escrita no socket\n");
 			printf("------------------------------------------\n");
-			/*read(sock_des_cli, msg_buffer, sizeof(msg_buffer)+1);
-			printf("Mensagem recebida: %s\n",msg_buffer);*/
-
+			read(sock_des_cli, usuario, sizeof(usuario)+1);
+			printf("Usuario conectado: %s\n",usuario);
+			write(fd_client, usuario,sizeof(usuario)+1);
+			read(fd_server, msg_buffer, sizeof(msg_buffer));
+			printf("Mensagem recebida do cliente...: %s\n", msg_buffer);
 				            	
 			pthread_t new_connection_tid;
 	            	//criar a thread para o usuario passa como argumento o proprio
