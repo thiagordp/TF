@@ -5,11 +5,11 @@
 #ifndef TF_FILESYSTEM_H
 #define TF_FILESYSTEM_H
 
-
+#include <stdlib.h>
+#include "util.h"
 #include "arquivo.h"
 #include "diretorio.h"
 
-diretorio_t *root = NULL;
 
 /**
  * Recebe um comando e um
@@ -17,7 +17,6 @@ diretorio_t *root = NULL;
 void comando(char comando[], size_data_t tamCmd, char dados[], size_data_t tamDados);
 
 
-// memória compartilhada.
-// semáforo
+long tamanhoFS(diretorio_t *root);
 
 #endif //TF_FILESYSTEM_H

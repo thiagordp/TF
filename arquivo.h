@@ -46,7 +46,7 @@ arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *diretorio);
 short apagaArq(char nome[], diretorio_t *dirAtual);
 
 /**
- * Abre o arquivo retornando o
+ * Abre o arquivo retornando o ponteiro para este a partir do nome do arquivo e do diretório atual.
  */
 arquivo_t *abreArq(char nome[], diretorio_t *dirAtual, itemArquivo_t **item);
 
@@ -99,10 +99,27 @@ size_data_t sizeArq(arquivo_t *arq);
 int moveArquivo(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
 
 /**
- * Varre o sistema de diretório em busca de um arquivo com
- * o nome indicado a partir do diretório atual.
- */
+   Copia o conteúdo total de um arquivo para outro.
+   Ponteiros para os arquivos de origem e destino
 
-int varreArquivo(char nome[], diretorio_t *root, arquivo_t **arq)
+   @Return Estado da operação.
+ */
+int copiaInfoArquivo(arquivo_t *arqOrigem, arquivo_t **arqDestino);
+
+int copiaArquivo(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
+
+/**
+ * Varre o sistema de diretório em busca de um arquivo com
+ * 3o nome indicado a partir do diretório atual.
+ */
+//
+//
+//int varreArquivo(char nome[], diretorio_t *root, arquivo_t **arq)
+
+
+/**
+ * Procura o arquivo com o nome na pasta indicada.
+ * */
+arquivo_t *procuraArq(char nomeArq[], diretorio_t *dirAtual);
 
 #endif //TF_ARQUIVO_H

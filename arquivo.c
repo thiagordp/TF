@@ -6,9 +6,9 @@
 #include <string.h>
 #include "arquivo.h"
 #include "diretorio.h"
-#include "listaPasta.h"
 #include "listaArquivo.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *dirAtual)
 {
 
@@ -36,13 +36,9 @@ arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *dirAtual)
     dirAtual->listaArqs->nextArq = itemArq;
 
     dirAtual->count_arq++;
-
-    printf("-----Arquivo-----\n");
-    printf("end:\t%p\n", novoArquivo);
-    printf("nome:\t%s\n", novoArquivo->nomeArq);
-    printf("dados:\t%s\n", novoArquivo->dados);
-    printf("tam:\t%ld\n", novoArquivo->tamanho);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 short apagaArq(char nome[], diretorio_t *dirAtual)
 {
@@ -55,7 +51,6 @@ short apagaArq(char nome[], diretorio_t *dirAtual)
     }
 
     // Mexer os ponteiros
-    printf("\nArquivo: %p\n", itemArq->arquivo);
     itemArq->prevArq->nextArq = itemArq->nextArq;
 
     if (itemArq->nextArq != NULL)
@@ -68,7 +63,11 @@ short apagaArq(char nome[], diretorio_t *dirAtual)
     // Free nas variáveis
     free(arq);
     free(itemArq);
+
+    return EXIT_SUCCESS;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 arquivo_t *abreArq(char nome[], diretorio_t *dirAtual, itemArquivo_t **item)
 {
@@ -79,7 +78,9 @@ arquivo_t *abreArq(char nome[], diretorio_t *dirAtual, itemArquivo_t **item)
         return arq;
     }
 
-    for (*item = dirAtual->listaArqs->nextArq; *item != NULL; *item = (*item)->nextArq)
+    for (*item = dirAtual->listaArqs->nextArq;
+         *item != NULL;
+         *item = (*item)->nextArq)
     {
         if (strcmp(nome, (*item)->arquivo->nomeArq) == 0)
         {
@@ -91,9 +92,11 @@ arquivo_t *abreArq(char nome[], diretorio_t *dirAtual, itemArquivo_t **item)
     return arq;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 byte *leArq(char nome[], diretorio_t *dirAtual)
 {
-    itemArquivo_t *item = dirAtual->listaArqs->nextArq;
+    itemArquivo_t *item;
     arquivo_t *arq = NULL;
 
     for (item = dirAtual->listaArqs->nextArq; item != NULL; item = item->nextArq)
@@ -103,55 +106,71 @@ byte *leArq(char nome[], diretorio_t *dirAtual)
             arq = item->arquivo;
         }
     }
-    // retornar bytes
+
+    if (arq != NULL)
+    {
+        byte *dados = calloc(strlen(arq->dados), sizeof(byte));
+        strcpy(dados, arq->dados);
+
+        return dados;
+    }
+
+    return NULL;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 short escreveArq(arquivo_t *arq, byte dados[])
 {
     if (arq == NULL)
     {
-        return -2;
+        return ER_NULL_POINTER;
     }
     else if (strlen(dados) > MAX_SIZE_ARQ)
     {
-        return 0;
+        return ER_INVALID_STRING;
     }
 
     strcpy(arq->dados, dados);
 
-    return 1;
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 short renomeiaArq(char nome[], arquivo_t *arq)
 {
     if (arq == NULL)
     {
-        return -2;
+        return ER_NULL_POINTER;
     }
     else if (strlen(nome) == 0)
     {
-        return -1;
+        return ER_EMPTY_STRING;
     }
     else if (strlen(nome) > MAX_SIZE_NAME_ARQ)
     {
-        return 0;
+        return ER_INVALID_STRING;
     }
 
     strcpy(arq->nomeArq, nome);
 
     arq->tamanho = sizeArq(arq);
 
-    return 1;
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 size_data_t sizeArq(arquivo_t *arq)
 {
     return (strlen(arq->dados) + strlen(arq->nomeArq));
 }
 
+/*
 arquivo_t *varreArquivo(char nome[], diretorio_t *root)
 {
-    /*
+
     // Rever lógica, pq pode ter mais de um arquivo com o mesmo nome,
     // mais em dir diferentes.
     if (root == NULL || arq == NULL)
@@ -183,11 +202,14 @@ arquivo_t *varreArquivo(char nome[], diretorio_t *root)
 
             }
         }
-    }*/
-}
+    }
+}*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int moveArquivo(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
-{    // Verificação de erros
+{
+    // Verificação de erros
     if (dirOrigem == NULL || dirDestino == NULL)
     {
         return ER_NULL_POINTER;
@@ -229,3 +251,57 @@ int moveArquivo(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
 
     return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int copiaInfoArquivo(arquivo_t *arqOrigem, arquivo_t **arqDestino)
+{
+
+}
+
+
+int copyArq(arquivo_t *arqDestino, arquivo_t *arqOrigem, diretorio_t *dir)
+{
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int copiaArquivo(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
+{
+    arquivo_t *arqOrigem, *arqDestino;
+
+    // Procurar o arquivo na pasta
+    // Pegar o ponteiro
+    arqOrigem = procuraArq(nomeDir, dirOrigem);
+
+    if (arqOrigem == NULL)
+    {
+        return ER_NOT_FOUND;
+    }
+
+    criaArq(arqOrigem->nomeArq, arqOrigem->dados, dirDestino);
+
+    return NO_ERROR;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+arquivo_t *procuraArq(char nomeArq[], diretorio_t *dirAtual)
+{
+    arquivo_t *arq = NULL;
+
+    for (itemArquivo_t *item = dirAtual->listaArqs->nextArq; item != NULL; item = item->nextArq)
+    {
+        if (strcmp(item->arquivo->nomeArq, nomeArq) == 0)
+        {
+            arq = item->arquivo;
+            break;
+        }
+    }
+
+    return arq;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

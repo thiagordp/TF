@@ -9,8 +9,9 @@
 #include "listaArquivo.h"
 #include "listaPasta.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int criaDir(char nome[], diretorio_t **dirAtual)
+diretorio_t *criaDir(char nome[], diretorio_t **dirAtual)
 {
     // Decl. do ponteiro pro novo diretório
     diretorio_t *novoDiretorio;
@@ -71,20 +72,18 @@ int criaDir(char nome[], diretorio_t **dirAtual)
         }
 
         (*dirAtual)->listasubDirs->nextDir = novoDir;
-
-        printf("---subdir----\nnome:\t%p\nprev:\t%p\nnext:\t%p\n-------------\n",
-               novoDiretorio->nomeDir,
-               novoDir->prevDir,
-               novoDir->nextDir
-        );
     }
+
+
+    return novoDiretorio;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int apagaDir(char nome[], diretorio_t *dirAtual)
 {
     if (dirAtual == NULL)
     {
-        printf("ER_NULL_POINTER\n");
         return ER_NULL_POINTER;
     }
 
@@ -93,8 +92,6 @@ int apagaDir(char nome[], diretorio_t *dirAtual)
     {
         //if (dirAtual->count_arq > 0) // REVISAR: talvez tenha que passar de qualquer forma
         //{
-
-        printf("LEN = 0\n");
 
         itemArquivo_t *item, *tempItem;
         arquivo_t *tempArq;
@@ -142,7 +139,6 @@ int apagaDir(char nome[], diretorio_t *dirAtual)
     }
     else
     {
-        printf("LEN > 0\n");
         diretorio_t *dirAt;
         itemSubDir_t *item;
 
@@ -153,7 +149,6 @@ int apagaDir(char nome[], diretorio_t *dirAtual)
 
         if (item == NULL || item->diretorio == NULL)
         {
-            printf("NULL / LEN > 0");
             return ER_NULL_POINTER;
         }
 
@@ -172,13 +167,17 @@ int apagaDir(char nome[], diretorio_t *dirAtual)
         free(item);
     }
     // caso contrário, apaga só o diretório com esse nome.
+
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int listaSubDir(diretorio_t *dirAtual)
 {
     printf("---------------------------------\n> %s\n---------------------------------\n",
            dirAtual->nomeDir);
-    printf("Nome\t\t\tNo Arqs\t\tNo Dirs\t\t\n");
+    printf("Nome\t\t\tEnd\t\t\tNo Arqs\t\tNo Dirs\t\t\n");
 
     itemSubDir_t *item;
     diretorio_t *dir;
@@ -187,14 +186,20 @@ int listaSubDir(diretorio_t *dirAtual)
     {
         dir = item->diretorio;
 
-        printf("%s\t\t\t%ld\t\t%ld\n", dir->nomeDir, dir->count_arq, dir->count_dir);
+        printf("%s\t\t\t%p\t\t\t%ld\t\t%ld\n", dir->nomeDir, dir, dir->count_arq, dir->count_dir);
     }
+
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int listaArquivo(diretorio_t *dirAtual)
 {
-
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int renomeiaDir(char nome[], diretorio_t *dirAtual)
 {
@@ -213,13 +218,14 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual)
 
     strcpy(dirAtual->nomeDir, nome);
 
-    return 1;
+    return NO_ERROR;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 diretorio_t *procuraDiretorio(char *nome, diretorio_t *dirAtual)
 {
     itemSubDir_t *item;
-    printf("\nSTART SEARCHING\n");
 
     if (dirAtual == NULL)
     {
@@ -235,10 +241,10 @@ diretorio_t *procuraDiretorio(char *nome, diretorio_t *dirAtual)
         }
     }
 
-    printf("\nFINISH SEARCH\n");
-
     return NULL;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
 {
@@ -288,5 +294,116 @@ int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
         item->nextDir->prevDir = item;
     }
 
-    return 1;
+    return NO_ERROR;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int copiaInfoDir(diretorio_t *dirOrigem, diretorio_t **dirDestino)
+{
+    if (*dirDestino != NULL)
+    {
+        free(dirDestino);
+    }
+
+    *dirDestino = (diretorio_t *) malloc(sizeof(diretorio_t));
+
+    // Cópia do nome da pasta.
+    // strcpy((*dirDestino)->nomeDir, dirOrigem->nomeDir);
+
+    criaDir(dirOrigem->nomeDir, dirDestino);
+
+    // Cópia do tamanho dos diretórios.
+    (*dirDestino)->count_arq = dirOrigem->count_arq;
+    (*dirDestino)->count_dir = dirOrigem->count_dir;
+
+    itemSubDir_t *item;
+    for (item = dirOrigem->listasubDirs->nextDir; item != NULL; item = item->nextDir)
+    {
+        itemSubDir_t *novoItem = (itemSubDir_t *) malloc(sizeof(itemSubDir_t));
+
+        diretorio_t *dir = NULL;
+        copiaDir("", item->diretorio, dir);
+    }
+
+    return NO_ERROR;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int copiaDir(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
+{
+    // ####################   Verificações iniciais   ################### //
+    if (strlen(nomeDir) == 0)
+    {
+        return ER_EMPTY_STRING;
+    }
+    else if (dirDestino == NULL || dirOrigem == NULL)
+    {
+        return ER_NULL_POINTER;
+    }
+    // ######################## Lógica dos esquemas ###################### //
+    diretorio_t *destino = NULL;
+    diretorio_t *dir = procuraDiretorio(nomeDir, dirOrigem);
+
+    if (dir == NULL)
+    {
+        return ER_NOT_FOUND;
+    }
+
+    return NO_ERROR;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int copyDir(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
+{
+    diretorio_t *dir, *dirCopia;
+
+    // ####################   Verificações iniciais   ################### //
+    if (dirDestino == NULL || dirOrigem == NULL)
+    {
+        return ER_NULL_POINTER;
+    }
+
+    // ######################## Lógica dos esquemas ###################### //
+
+    // Caso seja vazio, o diretório origem em si vai ser copiado para a pasta destino
+    if (strlen(nomeDir) == 0)
+    {
+        dir = dirOrigem;
+    }
+        // Se não, copia o arquivo com o nome indicado dentro da pasta origem.
+    else
+    {
+        // procura pelo diretório que será copiado
+        dir = procuraDiretorio(nomeDir, dirOrigem);
+
+
+        // caso esse diretório não exista.
+        if (dir == NULL)
+        {
+            return ER_NOT_FOUND;
+        }
+    }
+
+    // Cria um novo diretório que será a cópia na pasta de destino.
+    dirCopia = criaDir(dir->nomeDir, &dirDestino);
+
+    if (dirCopia == NULL)
+    {
+        return ER_NULL_POINTER;
+    }
+
+    for (itemSubDir_t *item = dir->listasubDirs->nextDir; item != NULL; item = item->nextDir)
+    {
+        copyDir("", item->diretorio, dirCopia);
+    }
+
+    for (itemArquivo_t *item = dir->listaArqs->nextArq; item != NULL; item = item->nextArq)
+    {
+        criaArq(item->arquivo->nomeArq, item->arquivo->dados, dirCopia);
+    }
+
+    return NO_ERROR;
 }

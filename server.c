@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+
 #define CHAVE_MEMORIA_COMPARTILHADA 10
 
 /*
@@ -20,14 +21,13 @@ void *Options();
 sem_t s_cliente;
 
 
-
 int main()
 {
 
 /*
 	semaforo
 */
-    sem_t* ptr_semaforo;
+    sem_t *ptr_semaforo;
 /*
 	variaveis do socket
 */
@@ -35,15 +35,16 @@ int main()
     struct sockaddr_in servidor, sock_cli;
 /*
 	variavel mensagem que sera utilizado para escrita no socket
-*/    
+*/
     char msg_buffer[80];
     int ultimoUser = 0;
 /*
 	inicializa em 1 o semaforo, verifica se inicializou com sucesso
 */
-    if(sem_init(&s_cliente, 0, 1) == -1){
-	printf("erro ao inicializar o semaforo \n");
-  }	
+    if (sem_init(&s_cliente, 0, 1) == -1)
+    {
+        printf("erro ao inicializar o semaforo \n");
+    }
 
 
 /* 
@@ -84,21 +85,23 @@ int main()
 	shmget = criação de uma área de memória compartilhada
 	shmat = mapeamento de uma área de memória compartilhada
 	
-*/    
+*/
 
-    mem_id = shmget(CHAVE_MEMORIA_COMPARTILHADA, sizeof(sem_t),0777|IPC_CREAT);
-    if(mem_id < 0){
-    	printf("Erro ao criar area de memoria compartilhada\n");
-    	exit(0);
+    mem_id = shmget(CHAVE_MEMORIA_COMPARTILHADA, sizeof(sem_t), 0777 | IPC_CREAT);
+    if (mem_id < 0)
+    {
+        printf("Erro ao criar area de memoria compartilhada\n");
+        exit(0);
     }
 
-    ptr_semaforo = (sem_t*)shmat(mem_id, (char*)0, 0);
-    if(ptr_semaforo == NULL){
-    	printf("Erro de mapeamento de memoria...\n");
-    	exit(0);
+    ptr_semaforo = (sem_t *) shmat(mem_id, (char *) 0, 0);
+    if (ptr_semaforo == NULL)
+    {
+        printf("Erro de mapeamento de memoria...\n");
+        exit(0);
     }
     *ptr_semaforo = s_cliente;
-    printf("Endereco semaforo: %p\n",ptr_semaforo);	
+    printf("Endereco semaforo: %p\n", ptr_semaforo);
 
 /* 
 	
@@ -107,16 +110,18 @@ int main()
      	10 - nº máximo de conexões.
 
 */
-    if (listen(socket_des, 10) < 0){
+    if (listen(socket_des, 10) < 0)
+    {
         fprintf(stderr, "Erro de listen\n");
         exit(0);
-    }else{
+    } else
+    {
         printf("Servidor pronto para conexoes....\n\n");
         //sem_init(&s_servidor, 0, 1);
     }
 
 
-    while(1)
+    while (1)
     {
         fromlen = sizeof(sock_cli); // Tamanho da struct do cliente
 
@@ -127,58 +132,60 @@ int main()
         }
         else
         {
-		printf("conexao aceita\n");
-		
-        	proc_filho = fork();
-        	if(proc_filho == 0){
-			printf("processo filho id:%d\n",getpid());
-        		//Falta declarar as variaveis: operation, option, text 
-        		//read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
-			//printf("depois de ler\n");
-			/*
-        		char *token = NULL;
+            printf("conexao aceita\n");
 
-    			token = strtok(msg_buffer, ";");
-    			operation = token;
+            proc_filho = fork();
+            if (proc_filho == 0)
+            {
+                printf("processo filho id:%d\n", getpid());
+                //Falta declarar as variaveis: operation, option, text
+                //read(sock_des_cli,msg_buffer,sizeof(msg_buffer));
+                //printf("depois de ler\n");
+                /*
+                    char *token = NULL;
 
-    			token = strtok(NULL, ";");
-    			option = token;
+                    token = strtok(msg_buffer, ";");
+                    operation = token;
 
-    			token = strtok(NULL, ";");
-    			text = token;
-			*/
-			
-			//printf("tenta imprimir\n");
-			//printf("%s\n",msg_buffer);
-			
-			
-			printf("servidor escrevendo no socket\n");			
-			
-			/*
-				Servidor escreve no socket
-			*/
-			int key = 10;
-			write(sock_des_cli, key, sizeof(key));
-			printf("Finalizada a escrita no socket\n");
+                    token = strtok(NULL, ";");
+                    option = token;
 
-			read(sock_des_cli, msg_buffer, sizeof(msg_buffer)+1);
-			printf("Mensagem recebida: %s\n",msg_buffer);
+                    token = strtok(NULL, ";");
+                    text = token;
+                */
 
-				            	
-			pthread_t new_connection_tid;
-	            	//criar a thread para o usuario passa como argumento o proprio
-	            	pthread_create(&new_connection_tid, NULL, Options, NULL);
-			pthread_join(new_connection_tid,NULL);
-			pthread_exit(NULL);
-			close(sock_des_cli);
-        	}else if(proc_filho > 0){
+                //printf("tenta imprimir\n");
+                //printf("%s\n",msg_buffer);
 
-        	}
+
+                printf("servidor escrevendo no socket\n");
+
+                /*
+                    Servidor escreve no socket
+                */
+                int key = 10;
+                write(sock_des_cli, key, sizeof(key));
+                printf("Finalizada a escrita no socket\n");
+
+                read(sock_des_cli, msg_buffer, sizeof(msg_buffer) + 1);
+                printf("Mensagem recebida: %s\n", msg_buffer);
+
+
+                pthread_t new_connection_tid;
+                //criar a thread para o usuario passa como argumento o proprio
+                pthread_create(&new_connection_tid, NULL, Options, NULL);
+                pthread_join(new_connection_tid, NULL);
+                pthread_exit(NULL);
+                close(sock_des_cli);
+            } else if (proc_filho > 0)
+            {
+
+            }
 
 
             //retirar usuario de usuarios
             //usuarios[i] = null;
-        
+
         }
     }
 }
@@ -193,7 +200,7 @@ void *Options()
 //memoria compartilhada
 
 //semaforo
-	printf("Cliente conectou!\n");
+    printf("Cliente conectou!\n");
 
 
 }

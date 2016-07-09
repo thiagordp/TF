@@ -7,13 +7,7 @@
 
 #include "def.h"
 #include "arquivo.h"
-
-/*
-#include "listaArquivo.h"
-#include "listaPasta.h"*/
-
 #include "util.h"
-
 
 /**
  * Representação de um diretório/pasta no sistema.
@@ -49,7 +43,7 @@ typedef struct diretorio
 /**
  * Cria diretório
  */
-int criaDir(char nome[], diretorio_t **dirAtual);
+diretorio_t *criaDir(char nome[], diretorio_t **dirAtual);
 
 /**
  * Apaga o diretório com o nome indicado que está dentro da pasta indicada.
@@ -97,5 +91,15 @@ int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
  * @return Status da operação
  */
 // arquivo_t *varreArquivo(char nome[], diretorio_t *root);
+
+int copiaInfoDir(diretorio_t *dirOrigem, diretorio_t **dirDestino);
+
+int copiaDir(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
+
+/**
+ * Cópia de todo o conteúdo de um diretório de nome indicado na pasta de
+ * origem para outro diretório destino.
+ * */
+int copyDir(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino);
 
 #endif //TF_DIRETORIO_H
