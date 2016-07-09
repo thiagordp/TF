@@ -37,6 +37,7 @@ int main()
 /*
 	Faz a leitura do que esta no socket
 */
+<<<<<<< HEAD
     printf("CHEGOU AQUI\n");
 
 /*   read(mysocket, key, sizeof(key));
@@ -49,4 +50,12 @@ int main()
     { }
     close(mysocket);
     return 0;
+=======
+   printf("CHEGOU AQUI\n");
+   write(mysocket, "roberto", strlen("roberto")+1);	
+
+	while(1);
+	close(mysocket);
+ 	return 0;
+>>>>>>> 6c1c067cd0a08f69088bd302afae4db4664da533
 }
