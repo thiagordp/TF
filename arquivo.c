@@ -11,6 +11,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *dirAtual)
 {
+    if (strlen(nome) == 0 || strlen(dados) == 0 || dirAtual == NULL)
+    {
+        return NULL;
+    }
+
 
     // Cria o arquivo
     arquivo_t *novoArquivo = (arquivo_t *) malloc(sizeof(arquivo_t));
@@ -43,6 +48,7 @@ arquivo_t *criaArq(char nome[], byte dados[], diretorio_t *dirAtual)
 short apagaArq(char nome[], diretorio_t *dirAtual)
 {
     itemArquivo_t *itemArq = NULL;
+
     arquivo_t *arq = abreArq(nome, dirAtual, &itemArq);
 
     if (arq == NULL || itemArq == NULL)
@@ -85,6 +91,8 @@ arquivo_t *abreArq(char nome[], diretorio_t *dirAtual, itemArquivo_t **item)
         if (strcmp(nome, (*item)->arquivo->nomeArq) == 0)
         {
             arq = (*item)->arquivo;
+
+            printf("item:\t%p\narq:\t%p\n", item, arq);
             break;
         }
     }

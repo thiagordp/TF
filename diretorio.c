@@ -173,11 +173,14 @@ int apagaDir(char nome[], diretorio_t *dirAtual)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int listaSubDir(diretorio_t *dirAtual)
+char *listaSubDir(diretorio_t *dirAtual)
 {
-    printf("---------------------------------\n> %s\n---------------------------------\n",
+    char *imprimirLista = NULL;
+    imprimirLista = (char *) malloc(sizeof(char) * 256);
+    strcpy(imprimirLista, "Diretorios: \n");
+    /*printf("---------------------------------\n> %s\n---------------------------------\n",
            dirAtual->nomeDir);
-    printf("Nome\t\t\tEnd\t\t\tNo Arqs\t\tNo Dirs\t\t\n");
+    printf("Nome\t\t\tEnd\t\t\tNo Arqs\t\tNo Dirs\t\t\n");*/
 
     itemSubDir_t *item;
     diretorio_t *dir;
@@ -185,18 +188,39 @@ int listaSubDir(diretorio_t *dirAtual)
     for (item = dirAtual->listasubDirs->nextDir; item != NULL; item = item->nextDir)
     {
         dir = item->diretorio;
-
+        strcat(imprimirLista, dir->nomeDir);
+        strcat(imprimirLista, "\n");
         printf("%s\t\t\t%p\t\t\t%ld\t\t%ld\n", dir->nomeDir, dir, dir->count_arq, dir->count_dir);
     }
-
-    return NO_ERROR;
+    //printf("%s\n",imprimirLista);
+    return imprimirLista;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int listaArquivo(diretorio_t *dirAtual)
+char *listaArquivo(diretorio_t *dirAtual)
 {
-    return NO_ERROR;
+
+    char *imprimirLista = NULL;
+    imprimirLista = (char *) malloc(sizeof(char) * 256);
+    strcpy(imprimirLista, "Arquivos: \n");
+
+    /*printf("---------------------------------\n> %s\n---------------------------------\n",
+           dirAtual->nomeDir);
+    printf("Nome\t\t\tEnd\t\t\tNo Arqs\t\tNo Dirs\t\t\n");*/
+
+    itemArquivo_t *item;
+    arquivo_t *arq;
+
+    for (item = dirAtual->listaArqs->nextArq; item != NULL; item = item->nextArq)
+    {
+        arq = item->arquivo;
+        strcat(imprimirLista, arq->nomeArq);
+        strcat(imprimirLista, "\n");
+        //printf("%s\t\t\t%p\t\t\t%ld\n", arq->nomeArq, arq, arq->tamanho);
+    }
+    printf("%s\n", imprimirLista);
+    return imprimirLista;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,6 +244,7 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual)
 
     return NO_ERROR;
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -246,6 +271,26 @@ diretorio_t *procuraDiretorio(char *nome, diretorio_t *dirAtual)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+diretorio_t *procuraDiretorioRec(char **tokens, int n, diretorio_t *dirAtual)
+{
+    diretorio_t *dir = NULL;
+
+    for (int i = 0; i < n; i++)
+    {
+        dir = procuraDiretorio(tokens[i], dirAtual);
+
+        if (dir == NULL)
+        {
+            return NULL;
+        }
+
+        dirAtual = dir;
+    }
+
+    return dir;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int moveDir(char nome[], diretorio_t *dirOrigem, diretorio_t *dirDestino)
 {
     // Verificação de erros

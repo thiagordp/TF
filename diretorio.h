@@ -53,12 +53,12 @@ int apagaDir(char nome[], diretorio_t *dirAtual);
 /**
  * Listagem dos subdiretórios
  */
-int listaSubDir(diretorio_t *dirAtual);
+char *listaSubDir(diretorio_t *dirAtual);
 
 /**
  * Lista os arquivos do diretório indicado.
  */
-int listaArquivo(diretorio_t *dirAtual);
+char *listaArquivo(diretorio_t *dirAtual);
 
 /*
  * Renomear o nome do diretório.
@@ -69,6 +69,11 @@ int renomeiaDir(char nome[], diretorio_t *dirAtual);
  *
  */
 diretorio_t *procuraDiretorio(char nome[], diretorio_t *dirAtual);
+
+/**
+ * Retorna o ponteiro da pasta indicado no caminho
+ * */
+diretorio_t *procuraDiretorioRec(char **tokens, int n, diretorio_t *dirAtual);
 
 /**
  * Move o diretório que outro

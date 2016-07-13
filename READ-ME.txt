@@ -1,1 +1,103 @@
 http://www-usr.inf.ufsm.br/~giovani/sockets/sockets.txt
+
+Descrição dos arquivos .c e .h
+
+##################################################################
+arquivo.h
+    Define a estrutura de um arquivo no sistema
+        arquivo_t
+            nomeArq -   Nome do arquivo
+            tamanho -   Tamanho do arquivo em bytes
+            dados   -   Dados do arquivo
+    Define as operações de
+        Criação
+        Exclusão
+        Abertura
+        Leitura
+        Escrita
+        Renomeação
+        Calculo de tamanho
+        Transferencia para outro diretorio
+        Copia para outro diretorio
+
+arquivo.c
+    Implementa as operações de
+        Criação
+        Exclusão
+        Abertura
+        Leitura
+        Escrita
+        Renomeação
+        Calculo de tamanho
+        Transferencia para outro diretorio
+        Copia para outro diretorio
+##################################################################
+diretorio.h
+    Define a estrutura de um diretório de arquivos e subdiretórios
+        diretorio_t
+            nomeDir     -   Nome do diretório
+            count_arq   -   Número de arquivos dentro do diretório
+            count_dir   -   Número de diretório dentro do diretório
+            listasubDirs-   Lista encadeada com os subdiretórios do diretório
+            listaArqs   -   Lista encadeada com os arquivos do diretório
+
+    Define as operações de
+        Criação
+        Exclusão
+        Listagem de diretórios
+        Listagem de arquivos
+        Renomeação
+        Procura de diretório
+        Calculo de tamanho
+        Transferencia para outro diretorio
+        Copia para outro diretorio
+
+diretorio.c
+    Implementa as operações de
+        Criação
+        Exclusão
+        Listagem de diretórios
+        Listagem de arquivos
+        Renomeação
+        Procura de diretório
+        Calculo de tamanho
+        Transferencia para outro diretorio
+        Copia para outro diretorio
+
+######################################################################
+filesystem.h        // No começo pensei em fazer a integração nesse arquivo.
+
+    Integração entre o servidor e o sistema de arquivos
+
+    comando     - interpreta o comando e chama as funções necessárias.
+    tamanhoFS   - calcula o tamanho em bytes de todo o sistema de arquivos
+
+
+filesystem.c
+    Implementação das funções
+
+#####################################################################
+
+listaArquivo.h
+    Define a estrutura de um item da lista encadeadas de arquivos de um diretório.
+
+    itemArquivo_t
+        arquivo         - ponteiro para o arquivo em si
+        prevArq         - ponteiro para o item anterior
+        nextArq         - ponteiro para o item posterior
+
+listaArquivo.c
+
+    Serve pra nada
+
+#####################################################################
+
+listaPasta.h
+
+    Define a estrutura de um item da lista encadeada de diretórios de um diretório
+
+    diretorio           - Ponteiro para o diretorio em si
+    prevDir             - Ponteiro para o item anterior
+    nextDir             - Ponteiro para o item posterior
+
+#####################################################################

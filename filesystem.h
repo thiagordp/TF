@@ -14,8 +14,25 @@
 /**
  * Recebe um comando e um
  * */
-void comando(char comando[], size_data_t tamCmd, char dados[], size_data_t tamDados);
+void ListarArquivos(char *comando);
 
+void ListarConteudo(char *comando);
+
+void CriarDiretorio(char *comando);
+
+void CriarArquivo(char *comando);
+
+void mostraConteudoArquivo(char *comando);
+
+void Remover(char *comando);
+
+void Mover(char *comando);
+
+void Copiar(char *comando);
+
+void Entrar(char *comando);
+
+void ComandoErrado();
 
 long tamanhoFS(diretorio_t *root);
 
