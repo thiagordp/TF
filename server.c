@@ -18,14 +18,11 @@
 #include "usuario.h"
 #include "util.h"
 
-#define CHAVE_MEMORIA_COMPARTILHADA 10
-#define CHAVE_MEMORIA_AUTENTICADOR 20
+#define CHAVE_MEMORIA_AUTENTICADOR      25
 
 /*
     include das structs no programa cliente, para o mesmo poder ler na memória compartilhada a estrutura de arquivos
 */
-
-
 void *Options(void *opt);
 
 //void *Autenticacao(void *aut);
@@ -45,11 +42,11 @@ void mostraConteudoArquivo(char *comando, int sock, usuario_t *user);
 
 void Remover(char *comando, int sock, usuario_t *user);
 
-void Mover(char *comando, usuario_t *user);
+void Mover(char *comando, usuario_t *user, int sock);
 
-void Copiar(char *comando, usuario_t *user);
+void Copiar(char *comando, usuario_t *user, int sock);
 
-void Entrar(char *comando, usuario_t *user);
+void Entrar(char *comando, usuario_t *user, int sock);
 
 void *NovoCliente(void *c);
 
@@ -68,8 +65,8 @@ char *text = NULL;
 /*
 	semaforo
 */
-sem_t semCliente;
-sem_t *ptrSemCliente;
+sem_t semClienteCopiar, semClienteRemover, semClienteMover;
+sem_t *ptrClienteCopiar, *ptrClienteRemover, *ptrClienteMover;
 
 /**
  * Semáforo compartilhado entre os processo que acessam o pipe.
@@ -100,14 +97,26 @@ ptr*/
 /*
 	inicializa em 1 o semaforo, verifica se inicializou com sucesso
 */
-    if (sem_init(&semCliente, 1, 1) == -1)
-    {
-        printf("erro ao inicializar o semaforo \n");
-    }
 
     if (sem_init(&semAutenticador, 1, 1) < 0)
     {
-        printf("Erro ao inicializar o semáforo do autenticador.");
+        printf("Erro ao inicializar o semáforo do autenticador.\n");
+        exit(0);
+    }
+    if (sem_init(&semClienteCopiar, 1, 1) < 0)
+    {
+        printf("Erro ao iniciar o semáforo copiar\n");
+        exit(0);
+    }
+    if (sem_init(&semClienteMover, 1, 1) < 0)
+    {
+        printf("Erro ao iniciar o semáforo mover\n");
+        exit(0);
+    }
+    if (sem_init(&semClienteRemover, 1, 1) < 0)
+    {
+        printf("Erro ao iniciar o semáforo remover\n");
+        exit(0);
     }
 
 
@@ -136,7 +145,6 @@ ptr*/
     servidor.sin_port = htons(2000);
     servidor.sin_addr.s_addr = htonl(INADDR_ANY);
     bzero(&(servidor.sin_zero), 8);
-
 /*
  	Relaciona o descritor a referência da struct.
 */
@@ -148,6 +156,7 @@ ptr*/
         exit(0);
     }
 
+
 /*
 	Criacao da area de memoria compartilhada
 	shmget = criação de uma área de memória compartilhada
@@ -155,26 +164,10 @@ ptr*/
 
 */
 
-    mem_id = shmget(CHAVE_MEMORIA_COMPARTILHADA, sizeof(sem_t), 0777 | IPC_CREAT);
-    if (mem_id < 0)
-    {
-        printf("Erro ao criar area de memoria compartilhada\n");
-        exit(0);
-    }
-
-    ptrSemCliente = (sem_t *) shmat(mem_id, (char *) 0, 0);
-    if (ptrSemCliente == NULL)
-    {
-        printf("Erro de mapeamento de memoria...\n");
-        exit(0);
-    }
-    *ptrSemCliente = semCliente;
-    printf("Endereco semaforo: %p\n", ptrSemCliente);
-
-
     /**
      * Criação da memória compartilhada que será usada para controlar o acesso ao pipe do autenticador.
      * */
+
     mem_aut = shmget(CHAVE_MEMORIA_AUTENTICADOR, sizeof(sem_t), 0777 | IPC_CREAT);
 
     if (mem_aut < 0)
@@ -183,7 +176,7 @@ ptr*/
         exit(0);
     }
 
-    ptrSemAutenticador = (sem_t *) shmat(mem_id, (char *) 0, 0);
+    ptrSemAutenticador = (sem_t *) shmat(mem_aut, (char *) 0, 0);
 
     if (ptrSemAutenticador == NULL)
     {
@@ -191,9 +184,11 @@ ptr*/
         exit(0);
     }
 
+    printf("%p\t%p\n", ptrSemAutenticador, &semAutenticador);
     *ptrSemAutenticador = semAutenticador;
     printf("Endereço do semáforo: %p\n\n", ptrSemAutenticador);
 
+    printf("...\n");
 
 /*
     Habilita o serv. para receber até 10 conexões.
@@ -397,9 +392,7 @@ void *Options(void *opt)
     }
 
     sem_t *ptr_mem;
-
     printf("Cliente conectou!\n");
-    printf("Endereco semaforo: %p\n", ptrSemCliente);
 
     /*
         Acesso a sessao critica
@@ -410,17 +403,13 @@ void *Options(void *opt)
     write(sock, "Conexao realizada com sucesso",
           sizeof("Conexao realizada com sucesso") + 1);
 
-    printf("SESSAO CRITICA \n");
-
-    sleep(1);
-
     do
     {
         printf("reading...\n");
         read(sock, comando, sizeof(comando));
         printf("Comando recebido:|%s|\n", comando);
 
-        char *comando_original = malloc(sizeof(char) * 30);
+        char *comando_original = malloc(sizeof(char) * MAX_SIZE_BUFFER);
         strcpy(comando_original, comando);
 
         comando;
@@ -453,23 +442,20 @@ void *Options(void *opt)
         }
         else if (strcmp(operation, "mv") == 0)
         {
-            Mover(comando_original, user);
+            Mover(comando_original, user, sock);
         }
         else if (strcmp(operation, "cp") == 0)
         {
-            Copiar(comando_original, user);
+            Copiar(comando_original, user, sock);
         }
         else if (strcmp(operation, "cd") == 0)
         {
-            Entrar(comando_original, user);
+            Entrar(comando_original, user, sock);
         }
         else if (strcmp(operation, "clear") == 0)
         {
             system("clear");
-        }
-        else if (strcmp(operation, "exit") != 0)
-        {
-            ComandoErrado(sock);
+            write(sock, "OK\n", sizeof("OK\n") + 1);
         }
 
         free(comando_original);
@@ -508,6 +494,7 @@ void ListarConteudo(char *comando, int sock, usuario_t *user)
 
     write(sock, imprimirConteudo, MAX_SIZE_BUFFER + 1);
 
+
     /*  listaSubDir(ptrRoot);
       listaArquivo(ptrRoot);*/
 
@@ -533,11 +520,12 @@ void CriarDiretorio(char *comando, int sock, usuario_t *user)
     criaDir(option, &user->dirAtual->diretorio);
 
     write(sock, "OK\n", sizeof("OK\n") + 1);
-
 }
 
 void CriarArquivo(char *comando, int sock, usuario_t *user)
 {
+    char retorno[MAX_SIZE_BUFFER];
+
     printf("Operacao de criar arquivo\n");
     token = strtok(comando, " ");
     operation = token;
@@ -550,7 +538,9 @@ void CriarArquivo(char *comando, int sock, usuario_t *user)
     printf(" Opcao: %s\n", option);
     printf(" Texto: %s\n", text);
     printf(" Resultado: %p", criaArq(option, text, user->dirAtual->diretorio));
-    write(sock, "OK\n", sizeof("OK\n") + 1);
+
+    strcpy(retorno, printCaminho(user));
+    write(sock, retorno, sizeof(MAX_SIZE_BUFFER));
 }
 
 void mostraConteudoArquivo(char *comando, int sock, usuario_t *user)
@@ -576,7 +566,7 @@ void Remover(char *comando, int sock, usuario_t *user)
     printf("------------------------------------------\n");
     printf("Antes do sem_wait\n");
 
-    sem_wait(ptrSemCliente);
+    sem_wait(&semClienteRemover);
 
     printf("Depois do sem_wait \n");
     printf("------------------------------------------\n");
@@ -608,12 +598,13 @@ void Remover(char *comando, int sock, usuario_t *user)
     write(sock, "OK\n", sizeof("OK\n") + 1);
     printf("------------------------------------------\n");
     printf("Antes do sem_post \n");
-    sem_post(ptrSemCliente);
+    printf("sleep...\n");
+    sem_post(&semClienteRemover);
     printf("Depois do sem_post \n");
     printf("------------------------------------------\n");
 }
 
-void Mover(char *comando, usuario_t *user)
+void Mover(char *comando, usuario_t *user, int sock)
 {
     char *foo;
 
@@ -642,6 +633,7 @@ void Mover(char *comando, usuario_t *user)
         printf("|%s|\n", tokens[i]);
     }
 
+    sem_wait(&semClienteMover);
     diretorio_t *dir = procuraDiretorioRec(tokens, x, root);
 
     // mv arquivo destino dir
@@ -663,11 +655,17 @@ void Mover(char *comando, usuario_t *user)
         printf("mover arquivo\n");
         moveArquivo(option, user->dirAtual->diretorio, dir);
     }
+    printf("sleep...\n");
+
+    write(sock, "OK\n", sizeof("OK\n") + 1);
+    sleep(10);
+    sem_post(&semClienteMover);
 }
 
-void Copiar(char *comando, usuario_t *user)
+void Copiar(char *comando, usuario_t *user, int sock)
 {
     char *pt = NULL;
+
 
     printf("Operacao de copiar\n");
     token = strtok(comando, " ");
@@ -695,6 +693,7 @@ void Copiar(char *comando, usuario_t *user)
         printf("|%s|\n", tokens[i]);
     }
 
+    sem_wait(&semClienteCopiar);
     diretorio_t *dir = procuraDiretorioRec(tokens, x, root);
 
     if (strcmp(pt, "dir") == 0)
@@ -714,9 +713,14 @@ void Copiar(char *comando, usuario_t *user)
 
         copiaArquivo(option, user->dirAtual->diretorio, dir);
     }
+    printf("sleep...\n");
+
+    write(sock, "OK\n", sizeof("OK\n") + 1);
+    sleep(10);
+    sem_post(&semClienteCopiar);
 }
 
-void Entrar(char *comando, usuario_t *user)
+void Entrar(char *comando, usuario_t *user, int sock)
 {
     printf("Operação de entrar");
 
@@ -730,6 +734,8 @@ void Entrar(char *comando, usuario_t *user)
     printf(" Opcao: %s\n", option);
     printf(" Texto: %s\n", text);
 
+
+    write(sock, "OK\n", sizeof("OK\n") + 1);
     if (strcmp(option, "..") == 0) // cd ..
     {
         retrocedeDir(user);

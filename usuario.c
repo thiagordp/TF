@@ -89,17 +89,18 @@ int retrocedeDir(usuario_t *user)
 
     user->dirAtual = item->nextDir;     // Pode ser NULL ou não
 
-
     free(item);
 
     return NO_ERROR;
 }
 
-int printCaminho(usuario_t *user)
+char *printCaminho(usuario_t *user)
 {
+    char *ret = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
+
     if (user == NULL)
     {
-        return ER_NULL_POINTER;
+        return NULL;
     }
 
     itemSubDir_t *item;
@@ -107,17 +108,22 @@ int printCaminho(usuario_t *user)
 
     if (item == NULL)
     {
-        printf("\n%s@%s:~$", user->nome, user->nome);
-        return (NO_ERROR);
+        sprintf(ret, "\n%s@%s:~$", user->nome, user->nome);
+
+        return ret;
     }
 
-    printf("\n%s@%s:", user->nome, user->nome);
+    sprintf(ret, "\n%s@%s:", user->nome, user->nome);
+
+    char temp[MAX_SIZE_BUFFER];
 
     for (; item != NULL; item = item->prevDir)
     {
-        printf("/%s", item->diretorio->nomeDir);
+        sprintf(temp, "/%s", item->diretorio->nomeDir);
+        strcat(ret, temp);
     }
-    printf("$ ");
+    sprintf(temp, "$ ");
+    strcat(ret, temp);
 
-    return NO_ERROR;
+    return ret;
 }

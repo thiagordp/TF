@@ -53,7 +53,7 @@ int main()
         read(mysocket, buffer_autenticacao, sizeof(buffer_autenticacao) + 1);
         printf(" %s\n", buffer_autenticacao);
         buffer = NULL;
-	buffer_recebido = NULL;
+	    buffer_recebido = NULL;
 
         do
         {

@@ -31,6 +31,6 @@ int retrocedeDir(usuario_t *user);
 /**
  * Imprime o caminho de diretório do user.
  * */
-int printCaminho(usuario_t *user);
+char* printCaminho(usuario_t *user);
 
 #endif //TF_USUARIO_H
