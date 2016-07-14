@@ -273,7 +273,6 @@ int copyArq(arquivo_t *arqDestino, arquivo_t *arqOrigem, diretorio_t *dir)
 
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int copiaArquivo(char nomeDir[], diretorio_t *dirOrigem, diretorio_t *dirDestino)

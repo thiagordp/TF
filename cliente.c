@@ -59,7 +59,7 @@ int main()
         {
             free(buffer);
             buffer = (char *) calloc(50, sizeof(char));
-	    buffer_recebido = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
+	        buffer_recebido = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
             //scanf("%s",buffer);
             fgets(buffer, 50, stdin);
             buffer[strlen(buffer) - 1] = '\0';

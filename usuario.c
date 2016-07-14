@@ -82,6 +82,10 @@ int retrocedeDir(usuario_t *user)
     {
         item->nextDir->prevDir = NULL;  // O diretório a seguir aponta para NULL;
     }
+    else // caso tenha só um item.
+    {
+        return NO_ERROR;
+    }
 
     user->dirAtual = item->nextDir;     // Pode ser NULL ou não
 

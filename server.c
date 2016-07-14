@@ -28,29 +28,28 @@
 
 void *Options(void *opt);
 
-void *Autenticacao(void *aut);
+//void *Autenticacao(void *aut);
+void Autenticacao(int sock, usuario_t **user);
 
 void *TrataConexao(void *sockDes);
 
-void *Verificacao(void *);
-
 void ListarArquivos(char *comando);
 
-void ListarConteudo(char *comando, int sock);
+void ListarConteudo(char *comando, int sock, usuario_t *user);
 
-void CriarDiretorio(char *comando, int sock);
+void CriarDiretorio(char *comando, int sock, usuario_t *user);
 
-void CriarArquivo(char *comando, int sock);
+void CriarArquivo(char *comando, int sock, usuario_t *user);
 
-void mostraConteudoArquivo(char *comando, int sock);
+void mostraConteudoArquivo(char *comando, int sock, usuario_t *user);
 
-void Remover(char *comando, int sock);
+void Remover(char *comando, int sock, usuario_t *user);
 
-void Mover(char *comando);
+void Mover(char *comando, usuario_t *user);
 
-void Copiar(char *comando);
+void Copiar(char *comando, usuario_t *user);
 
-void Entrar(char *comando);
+void Entrar(char *comando, usuario_t *user);
 
 void *NovoCliente(void *c);
 
@@ -64,7 +63,7 @@ char *operation = NULL;
 char *option = NULL;
 char *text = NULL;
 
-usuario_t *user;
+//usuario_t *user;
 
 /*
 	semaforo
@@ -298,17 +297,13 @@ ptr*/
     }
 }
 
-void *Autenticacao(void *aut)
+void Autenticacao(int sock, usuario_t **user)
 {
-    int sock = *(int *) aut;
-
     printf("SERVER: CHEGOU NA THREAD AUTENTICACAO \n");
     printf("sock: %d\n", sock);
     char msg_buffer[80];
     char usuario[30];
     int fd_server, fd_autenticador, pid;
-
-    // else -- continua a processa.
 
     /*
         Abertura do PIPE
@@ -340,14 +335,14 @@ void *Autenticacao(void *aut)
     printf("Lendo do socket...\n");
     read(sock, usuario, sizeof(usuario) + 1);
     printf("Usuario conectado: %s\n", usuario);
-    //criarUsuario(usuario,root);
+
+
 
     /*
         Escreve no PIPE o usuario passado pelo cliente
     */
     sem_wait(&semAutenticador);
     write(fd_autenticador, usuario, sizeof(usuario) + 1);
-    //write(fd_autenticador, "", sizeof("") + 1);
     bzero(msg_buffer, sizeof(msg_buffer));
 
     printf("SERVER: Lendo a resposta da autenticação...\n");
@@ -360,7 +355,8 @@ void *Autenticacao(void *aut)
         printf("SERVER: Validado\n");
         write(sock, "V", sizeof("V") + 1);
 
-        user = criaUsuario(usuario, root);
+        // criação do usuário
+        *user = criaUsuario(usuario, root);
     }
     else
     {
@@ -373,14 +369,12 @@ void *Autenticacao(void *aut)
 
     close(fd_server);
     close(fd_autenticador);
-
-    pthread_exit(NULL);
 }
 
 void *Options(void *opt)
 {
     int sock = *(int *) opt;
-    void **data = (void *) calloc(2, sizeof(void *));
+    usuario_t *user = NULL;
 
     char comando[50];
     printf("SERVER: CHEGOU NA THREAD VERIFICACAO \n");
@@ -388,12 +382,22 @@ void *Options(void *opt)
     /*
         Cria a thread de autenticacao
     */
-    pthread_t autenticacao_tid;
-    pthread_create(&autenticacao_tid, NULL, Autenticacao, opt);
-    pthread_join(autenticacao_tid, NULL);
+    /*  pthread_t autenticacao_tid;
+      pthread_create(&autenticacao_tid, NULL, Autenticacao, array);
+      pthread_join(autenticacao_tid, NULL);
+  */
+
+    Autenticacao(sock, &user);
+
+    if (user == NULL)
+    {
+
+        printf("Nous avons un problème");
+        pthread_exit(NULL);
+    }
 
     sem_t *ptr_mem;
-    int mem_id;
+
     printf("Cliente conectou!\n");
     printf("Endereco semaforo: %p\n", ptrSemCliente);
 
@@ -425,38 +429,39 @@ void *Options(void *opt)
 
         if (strcmp(operation, "ls") == 0)
         {
-            ListarConteudo(comando_original, sock);
+            //ListarConteudo(comando_original, sock);
+            ListarConteudo(comando_original, sock, user);
             //listaArquivo(root);
         }
         else if (strcmp(operation, "mkdir") == 0)
         {
-            CriarDiretorio(comando_original, sock);
+            CriarDiretorio(comando_original, sock, user);
         }
         else if (strcmp(operation, "touch") == 0)
         {
             printf("antes de iniciar o touch\n");
-            CriarArquivo(comando_original, sock);
+            CriarArquivo(comando_original, sock, user);
             printf("depois do touch\n");
         }
         else if (strcmp(operation, "cat") == 0)
         {
-            mostraConteudoArquivo(comando_original, sock);
+            mostraConteudoArquivo(comando_original, sock, user);
         }
         else if (strcmp(operation, "rm") == 0)
         {
-            Remover(comando_original, sock);
+            Remover(comando_original, sock, user);
         }
         else if (strcmp(operation, "mv") == 0)
         {
-            Mover(comando_original);
+            Mover(comando_original, user);
         }
         else if (strcmp(operation, "cp") == 0)
         {
-            Copiar(comando_original);
+            Copiar(comando_original, user);
         }
         else if (strcmp(operation, "cd") == 0)
         {
-            Entrar(comando_original);
+            Entrar(comando_original, user);
         }
         else if (strcmp(operation, "clear") == 0)
         {
@@ -475,7 +480,22 @@ void *Options(void *opt)
     printf("fim da execucao do cliente\n");
 }
 
-void ListarConteudo(char *comando, int sock)
+void *NovoCliente(void *c)
+{
+    pthread_t new_connection_tid;
+    pthread_create(&new_connection_tid, NULL, Options, NULL);
+    pthread_join(new_connection_tid, NULL);
+}
+
+//void *TrataConexao(void *sockDes)
+void *TrataConexao(void *sockDes)
+{
+    pthread_t new_connection_tid;
+    pthread_create(&new_connection_tid, NULL, Options, sockDes);
+    pthread_join(new_connection_tid, NULL);
+}
+
+void ListarConteudo(char *comando, int sock, usuario_t *user)
 {
     char *imprimirConteudo;
     imprimirConteudo = (char *) malloc(sizeof(char) * 1024);
@@ -494,7 +514,7 @@ void ListarConteudo(char *comando, int sock)
     free(imprimirConteudo);
 }
 
-void CriarDiretorio(char *comando, int sock)
+void CriarDiretorio(char *comando, int sock, usuario_t *user)
 {
 
     printf("Operacao de criar diretorio\n");
@@ -516,7 +536,7 @@ void CriarDiretorio(char *comando, int sock)
 
 }
 
-void CriarArquivo(char *comando, int sock)
+void CriarArquivo(char *comando, int sock, usuario_t *user)
 {
     printf("Operacao de criar arquivo\n");
     token = strtok(comando, " ");
@@ -533,7 +553,7 @@ void CriarArquivo(char *comando, int sock)
     write(sock, "OK\n", sizeof("OK\n") + 1);
 }
 
-void mostraConteudoArquivo(char *comando, int sock)
+void mostraConteudoArquivo(char *comando, int sock, usuario_t *user)
 {
     printf("Operacao de mostrar conteudo do arquivo\n");
     token = strtok(comando, " ");
@@ -551,7 +571,7 @@ void mostraConteudoArquivo(char *comando, int sock)
     write(sock, texto, strlen(texto) + 1);
 }
 
-void Remover(char *comando, int sock)
+void Remover(char *comando, int sock, usuario_t *user)
 {
     printf("------------------------------------------\n");
     printf("Antes do sem_wait\n");
@@ -593,7 +613,7 @@ void Remover(char *comando, int sock)
     printf("------------------------------------------\n");
 }
 
-void Mover(char *comando)
+void Mover(char *comando, usuario_t *user)
 {
     char *foo;
 
@@ -645,7 +665,7 @@ void Mover(char *comando)
     }
 }
 
-void Copiar(char *comando)
+void Copiar(char *comando, usuario_t *user)
 {
     char *pt = NULL;
 
@@ -696,7 +716,7 @@ void Copiar(char *comando)
     }
 }
 
-void Entrar(char *comando)
+void Entrar(char *comando, usuario_t *user)
 {
     printf("Operação de entrar");
 
@@ -726,19 +746,3 @@ void ComandoErrado(int sock)
           sizeof("Comando inexistente, tente novamente\n") + 1);
 }
 
-void *NovoCliente(void *c)
-{
-
-
-    pthread_t new_connection_tid;
-    pthread_create(&new_connection_tid, NULL, Options, NULL);
-    pthread_join(new_connection_tid, NULL);
-}
-
-void *TrataConexao(void *sockDes)
-{
-
-    pthread_t new_connection_tid;
-    pthread_create(&new_connection_tid, NULL, Options, sockDes);
-    pthread_join(new_connection_tid, NULL);
-}
