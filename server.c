@@ -50,7 +50,7 @@ void Entrar(char *comando, usuario_t *user, int sock);
 
 void *NovoCliente(void *c);
 
-void ComandoErrado(int sock);
+void ComandoErrado(int sock, usuario_t *user);
 
 /*
 	Tokens para operacoes
@@ -66,7 +66,6 @@ char *text = NULL;
 	semaforo
 */
 sem_t semClienteCopiar, semClienteRemover, semClienteMover;
-sem_t *ptrClienteCopiar, *ptrClienteRemover, *ptrClienteMover;
 
 /**
  * Semáforo compartilhado entre os processo que acessam o pipe.
@@ -267,28 +266,6 @@ ptr*/
         pthread_t new_connection_tid;
         pthread_create(&new_connection_tid, NULL, TrataConexao, (void *) newSock);
 
-        // pthread_join(new_connection_tid, NULL);
-        /*proc_filho = fork();
-        printf("Socket: %d", sock_cli);
-        if (proc_filho == 0)
-        {
-            printf("processo filho id:%d\n", getpid());
-            printf("ENDERECO RAIZ %p\n", ptrRaiz);
-            pthread_t new_connection_tid;
-            pthread_create(&new_connection_tid, NULL, Options, NULL);
-            pthread_join(new_connection_tid, NULL);
-
-            close(sock_des_cli);
-            pthread_exit(NULL);
-        }
-        else if (proc_filho > 0)
-        {
-            printf("processo pai: %d\n", getpid());
-        }
-        else
-        {
-            exit(0);
-        }*/
     }
 }
 
@@ -370,6 +347,7 @@ void *Options(void *opt)
 {
     int sock = *(int *) opt;
     usuario_t *user = NULL;
+    char *path;
 
     char comando[50];
     printf("SERVER: CHEGOU NA THREAD VERIFICACAO \n");
@@ -386,7 +364,6 @@ void *Options(void *opt)
 
     if (user == NULL)
     {
-
         printf("Nous avons un problème");
         pthread_exit(NULL);
     }
@@ -399,28 +376,32 @@ void *Options(void *opt)
     */
 
     bzero(&sock, 0);
-    /////////////////////////// PROBLEMA   /////////////////////////////////////
-    write(sock, "Conexao realizada com sucesso",
-          sizeof("Conexao realizada com sucesso") + 1);
+
+    char buf[MAX_SIZE_BUFFER];
+
+    bzero(buf, MAX_SIZE_BUFFER);
+
+    strcpy(buf, "Conexao realizada com sucesso\n\n");
+    strcat(buf, printCaminho(user));
+
+    write(sock, buf, MAX_SIZE_BUFFER);
 
     do
     {
-        printf("reading...\n");
+        printf("A espera de comandos...\n");
         read(sock, comando, sizeof(comando));
         printf("Comando recebido:|%s|\n", comando);
 
         char *comando_original = malloc(sizeof(char) * MAX_SIZE_BUFFER);
         strcpy(comando_original, comando);
 
-        comando;
+        //comando;
         token = strtok(comando, " ");
         operation = token;
 
         if (strcmp(operation, "ls") == 0)
         {
-            //ListarConteudo(comando_original, sock);
             ListarConteudo(comando_original, sock, user);
-            //listaArquivo(root);
         }
         else if (strcmp(operation, "mkdir") == 0)
         {
@@ -428,9 +409,7 @@ void *Options(void *opt)
         }
         else if (strcmp(operation, "touch") == 0)
         {
-            printf("antes de iniciar o touch\n");
             CriarArquivo(comando_original, sock, user);
-            printf("depois do touch\n");
         }
         else if (strcmp(operation, "cat") == 0)
         {
@@ -455,7 +434,16 @@ void *Options(void *opt)
         else if (strcmp(operation, "clear") == 0)
         {
             system("clear");
-            write(sock, "OK\n", sizeof("OK\n") + 1);
+            char *ret = printCaminho(user);
+            write(sock, ret, strlen(ret) + 1);
+        }
+        else if (strcmp(operation, "exit") == 0)
+        {
+
+        }
+        else
+        {
+            ComandoErrado(sock, user);
         }
 
         free(comando_original);
@@ -466,12 +454,7 @@ void *Options(void *opt)
     printf("fim da execucao do cliente\n");
 }
 
-void *NovoCliente(void *c)
-{
-    pthread_t new_connection_tid;
-    pthread_create(&new_connection_tid, NULL, Options, NULL);
-    pthread_join(new_connection_tid, NULL);
-}
+
 
 //void *TrataConexao(void *sockDes)
 void *TrataConexao(void *sockDes)
@@ -484,19 +467,17 @@ void *TrataConexao(void *sockDes)
 void ListarConteudo(char *comando, int sock, usuario_t *user)
 {
     char *imprimirConteudo;
+
     imprimirConteudo = (char *) malloc(sizeof(char) * 1024);
     printf("%s\n", comando);
-    printf("Operacao de listagem de conteudo\n");
-
+    strcat(imprimirConteudo, "\n");
     strcat(imprimirConteudo, listaSubDir(user->dirAtual->diretorio));
     strcat(imprimirConteudo, "\n");
     strcat(imprimirConteudo, listaArquivo(user->dirAtual->diretorio));
+    strcat(imprimirConteudo, "\n");
+    strcat(imprimirConteudo, printCaminho(user));
 
     write(sock, imprimirConteudo, MAX_SIZE_BUFFER + 1);
-
-
-    /*  listaSubDir(ptrRoot);
-      listaArquivo(ptrRoot);*/
 
     free(imprimirConteudo);
 }
@@ -519,12 +500,14 @@ void CriarDiretorio(char *comando, int sock, usuario_t *user)
 
     criaDir(option, &user->dirAtual->diretorio);
 
-    write(sock, "OK\n", sizeof("OK\n") + 1);
+    text = printCaminho(user);
+
+    write(sock, text, strlen(text) + 1);
 }
 
 void CriarArquivo(char *comando, int sock, usuario_t *user)
 {
-    char retorno[MAX_SIZE_BUFFER];
+    char *retorno = NULL;
 
     printf("Operacao de criar arquivo\n");
     token = strtok(comando, " ");
@@ -534,13 +517,11 @@ void CriarArquivo(char *comando, int sock, usuario_t *user)
     token = strtok(NULL, " ");
     text = token;
 
-    printf(" Operacao: %s\n", operation);
-    printf(" Opcao: %s\n", option);
-    printf(" Texto: %s\n", text);
-    printf(" Resultado: %p", criaArq(option, text, user->dirAtual->diretorio));
+    criaArq(option, text, user->dirAtual->diretorio);
 
-    strcpy(retorno, printCaminho(user));
-    write(sock, retorno, sizeof(MAX_SIZE_BUFFER));
+    retorno = printCaminho(user);
+
+    write(sock, retorno, MAX_SIZE_BUFFER);
 }
 
 void mostraConteudoArquivo(char *comando, int sock, usuario_t *user)
@@ -555,9 +536,16 @@ void mostraConteudoArquivo(char *comando, int sock, usuario_t *user)
     printf(" Operacao: %s\n", operation);
     printf(" Opcao: %s\n", option);
     printf(" Texto: %s\n", text);
-    char *texto;
-    texto = leArq(option, user->dirAtual->diretorio);
+
+    char *texto = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
+
+    strcat(texto, leArq(option, user->dirAtual->diretorio));
+
     printf("%s\n", texto);
+
+    strcat(texto, "\n");
+    strcat(texto, printCaminho(user));
+
     write(sock, texto, strlen(texto) + 1);
 }
 
@@ -595,11 +583,15 @@ void Remover(char *comando, int sock, usuario_t *user)
         printf("par. invalido\n");
     }
 
-    write(sock, "OK\n", sizeof("OK\n") + 1);
+    text = printCaminho(user);
+    write(sock, text, strlen(text) + 1);
+
     printf("------------------------------------------\n");
     printf("Antes do sem_post \n");
     printf("sleep...\n");
+
     sem_post(&semClienteRemover);
+
     printf("Depois do sem_post \n");
     printf("------------------------------------------\n");
 }
@@ -657,15 +649,15 @@ void Mover(char *comando, usuario_t *user, int sock)
     }
     printf("sleep...\n");
 
-    write(sock, "OK\n", sizeof("OK\n") + 1);
+    strcpy(foo, printCaminho(user));
     sleep(10);
     sem_post(&semClienteMover);
+    write(sock, foo, strlen(foo) + 1);
 }
 
 void Copiar(char *comando, usuario_t *user, int sock)
 {
     char *pt = NULL;
-
 
     printf("Operacao de copiar\n");
     token = strtok(comando, " ");
@@ -714,14 +706,16 @@ void Copiar(char *comando, usuario_t *user, int sock)
         copiaArquivo(option, user->dirAtual->diretorio, dir);
     }
     printf("sleep...\n");
-
-    write(sock, "OK\n", sizeof("OK\n") + 1);
+    pt = printCaminho(user);
     sleep(10);
+    write(sock, pt, strlen(pt) + 1);
     sem_post(&semClienteCopiar);
 }
 
 void Entrar(char *comando, usuario_t *user, int sock)
 {
+    char *path;
+
     printf("Operação de entrar");
 
     token = strtok(comando, " ");
@@ -730,12 +724,11 @@ void Entrar(char *comando, usuario_t *user, int sock)
     option = token;
     token = strtok(NULL, " ");
     text = token;
+
     printf(" Operacao: %s\n", operation);
     printf(" Opcao: %s\n", option);
     printf(" Texto: %s\n", text);
 
-
-    write(sock, "OK\n", sizeof("OK\n") + 1);
     if (strcmp(option, "..") == 0) // cd ..
     {
         retrocedeDir(user);
@@ -744,11 +737,21 @@ void Entrar(char *comando, usuario_t *user, int sock)
     {
         avancaDir(user, procuraDiretorio(option, user->dirAtual->diretorio));
     }
+
+    path = printCaminho(user);
+    write(sock, path, strlen(path) + 1);
 }
 
-void ComandoErrado(int sock)
+void ComandoErrado(int sock, usuario_t *user)
 {
-    write(sock, "Comando inexistente, tente novamente\n",
-          sizeof("Comando inexistente, tente novamente\n") + 1);
+    char ret[MAX_SIZE_BUFFER];
+
+    strcpy(ret, "Comando inexistente, tente novamente\n");
+
+    char *path = printCaminho(user);
+
+    strcat(ret, path);
+
+    write(sock, ret, strlen(ret) + 1);
 }
 

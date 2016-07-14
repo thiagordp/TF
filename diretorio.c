@@ -188,6 +188,7 @@ char *listaSubDir(diretorio_t *dirAtual)
     for (item = dirAtual->listasubDirs->nextDir; item != NULL; item = item->nextDir)
     {
         dir = item->diretorio;
+        strcat(imprimirLista, "\t");
         strcat(imprimirLista, dir->nomeDir);
         strcat(imprimirLista, "\n");
         printf("%s\t\t\t%p\t\t\t%ld\t\t%ld\n", dir->nomeDir, dir, dir->count_arq, dir->count_dir);
@@ -215,6 +216,7 @@ char *listaArquivo(diretorio_t *dirAtual)
     for (item = dirAtual->listaArqs->nextArq; item != NULL; item = item->nextArq)
     {
         arq = item->arquivo;
+        strcat(imprimirLista, "\t");
         strcat(imprimirLista, arq->nomeArq);
         strcat(imprimirLista, "\n");
         //printf("%s\t\t\t%p\t\t\t%ld\n", arq->nomeArq, arq, arq->tamanho);

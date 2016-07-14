@@ -14,7 +14,7 @@
 int main()
 {
     char *buffer;
-    char buffer_autenticacao[50];
+    char buffer_autenticacao[MAX_SIZE_BUFFER];
     char usuario[50];
     char *buffer_recebido;
     int len, mysocket, key;
@@ -43,32 +43,35 @@ int main()
 */
     printf("Entre com o usuario: \n");
     fgets(usuario, 50, stdin);
-    usuario[strlen(usuario)-1]='\0';
-    write(mysocket,usuario, strlen(usuario) + 1);
+    usuario[strlen(usuario) - 1] = '\0';
+    write(mysocket, usuario, strlen(usuario) + 1);
     read(mysocket, buffer_autenticacao, sizeof(buffer_autenticacao) + 1);
-    printf("escreveu no socket: %s\n", buffer_autenticacao);
 
     if (strcmp(buffer_autenticacao, "V") == 0)
     {
         read(mysocket, buffer_autenticacao, sizeof(buffer_autenticacao) + 1);
-        printf(" %s\n", buffer_autenticacao);
+        printf("%s", buffer_autenticacao);
         buffer = NULL;
-	    buffer_recebido = NULL;
+        buffer_recebido = NULL;
 
         do
         {
             free(buffer);
             buffer = (char *) calloc(50, sizeof(char));
-	        buffer_recebido = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
-            //scanf("%s",buffer);
-            fgets(buffer, 50, stdin);
+            buffer_recebido = (char *) calloc(MAX_SIZE_BUFFER, sizeof(char));
+
+            fgets(buffer, MAX_SIZE_BUFFER, stdin);
             buffer[strlen(buffer) - 1] = '\0';
-            printf("cmd: |%s|\n", buffer);
+
+            if (strcmp(buffer, "clear") == 0)
+            {
+                system("clear");
+            }
 
             write(mysocket, buffer, strlen(buffer) + 1);
-            read(mysocket,buffer_recebido,MAX_SIZE_BUFFER + 1);
-            printf(" %s\n",buffer_recebido);
-	    
+
+            read(mysocket, buffer_recebido, MAX_SIZE_BUFFER + 1);
+            printf("%s", buffer_recebido);
         }
         while (strcmp(buffer, "exit") != 0);
     }
